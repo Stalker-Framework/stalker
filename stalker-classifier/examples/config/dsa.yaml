@@ -1,0 +1,10 @@
+path: data/
+has_expected: false
+fields: 3
+experiments:
+  aarch64-linux:
+    - ecdsa
+  aarch64-macos:
+    - ecdsa
+  x86_64-linux:
+    - ecdsa

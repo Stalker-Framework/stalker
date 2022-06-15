@@ -1,0 +1,16 @@
+[package]
+name = "stalker-classifier"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+hex = "*"
+strum = "0.23"
+strum_macros = "0.23"
+lazy_static = "*"
+derive_more = "*"
+serde = { version = "*", features = ["derive"] }
+serde_yaml = "*"
+anyhow = "*"

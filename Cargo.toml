@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+    "stalker-bin",
+    "stalker-utils",
+    "stalker-mutator",
+    "stalker-injector",
+    "stalker-classifier",
+]

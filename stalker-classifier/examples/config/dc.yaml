@@ -1,0 +1,13 @@
+path: data/
+has_expected: true
+fields: 3
+experiments:
+  aarch64-linux:
+    - aes
+  aarch64-macos:
+    - aes
+    - modes
+  x86_64-linux:
+    - aes
+    - salsa20
+    - modes
