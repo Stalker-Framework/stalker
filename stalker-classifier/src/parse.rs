@@ -64,7 +64,7 @@ impl Fields {
             Fields(vec![])
         } else {
             if buf.len() < group_size {
-                return Fields(vec![])
+                return Fields(vec![]);
             }
             let texts = buf
                 .chunks(buf.len() / group_size)
@@ -76,7 +76,7 @@ impl Fields {
 
     pub fn is_empty(&self) -> bool {
         match self {
-            Fields(data) => data.is_empty()
+            Fields(data) => data.is_empty(),
         }
     }
 }

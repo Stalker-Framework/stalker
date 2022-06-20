@@ -71,8 +71,7 @@ impl Effect for ProbabilisticSignatureEffect {
             .iter()
             .map(|cnts| entropy_of_cnts(cnts, cnt))
             .reduce(f64::min)
-            .unwrap()
-            .clone();
+            .unwrap();
         if nonce_reuse != 0 {
             NonceReuse(nonce_reuse as f64 / cnt as f64)
         } else if freq_max <= 0.2 {

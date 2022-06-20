@@ -1,6 +1,6 @@
+use anyhow::Result;
 use stalker_classifier::analyze::*;
 use stalker_classifier::effect::*;
-use anyhow::Result;
 use std::env;
 
 fn main() -> Result<()> {

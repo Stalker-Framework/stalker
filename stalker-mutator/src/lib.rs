@@ -1,11 +1,11 @@
 use stalker_utils::asm::Asm;
 use stalker_utils::context::Context;
+use std::boxed::Box;
 
-pub struct AsmMutant {
+pub struct AsmMutants {
     base: Vec<u8>,
-    len: usize,
-    ctx: Context,
-    args: String,
+    size: usize,
+    ctx: Box<Context>,
     bit: (usize, usize),
     mask: u8,
 }
@@ -14,40 +14,35 @@ pub trait Mutatable
 where
     Self: Sized,
 {
-    fn mutants(&self, ctx: Option<Context>) -> AsmMutant;
+    fn mutants(&self, ctx: Option<Context>) -> AsmMutants;
 }
 
 impl Mutatable for Asm {
-    fn mutants(&self, ctx: Option<Context>) -> AsmMutant {
-        let ctx = ctx.unwrap();
-        let args = ctx.config.arch.to_cli_args();
-        AsmMutant {
+    fn mutants(&self, ctx: Option<Context>) -> AsmMutants {
+        let ctx = ctx.unwrap_or_default();
+        AsmMutants {
             base: self.bytes.to_vec(),
-            len: self.size as usize,
-            ctx,
-            args,
+            size: self.size as usize,
+            ctx: Box::new(ctx),
             bit: (0, 0),
             mask: 1,
         }
     }
 }
 
-impl Iterator for AsmMutant {
+impl Iterator for AsmMutants {
     type Item = Asm;
     fn next(&mut self) -> Option<Self::Item> {
         if self.bit.1 == 8 {
             self.bit.0 += 1;
             (self.mask, self.bit.1) = (1, 0);
         }
-        if self.bit.0 == self.len {
+        if self.bit.0 == self.size {
             return None;
         }
         let mut bytes = self.base.clone();
         bytes[self.bit.0] ^= self.mask;
-        let mutant = self
-            .ctx
-            .disasm(&self.args, &bytes)
-            .expect("Failed at creating mutant.");
+        let mutant = self.ctx.disasm(&bytes).expect("Failed at creating mutant.");
         self.mask <<= 1;
         self.bit.1 += 1;
         Some(mutant)

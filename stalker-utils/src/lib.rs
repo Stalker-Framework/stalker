@@ -1,6 +1,7 @@
 pub mod asm;
 pub mod config;
 pub mod context;
+mod fmt;
 pub mod loc;
 
 #[cfg(test)]

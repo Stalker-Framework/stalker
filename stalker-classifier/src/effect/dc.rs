@@ -41,7 +41,7 @@ impl Effect for DeterministicCipherEffect {
         assert!(expect.is_some());
 
         let expect = expect.clone().unwrap();
-        let cnt = res.len().min(expect.clone().len());
+        let cnt = res.len().min(expect.len());
 
         let mut correct = 0;
         let mut odd_plaintext = 0;
@@ -125,7 +125,6 @@ impl Effect for DeterministicCipherEffect {
                 .map(|cnts| entropy_of_cnts(cnts, cnt))
                 .reduce(f64::min)
                 .unwrap()
-                .clone()
         } else {
             0.0
         };
