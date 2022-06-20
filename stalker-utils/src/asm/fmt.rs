@@ -1,6 +1,7 @@
 use crate::asm::inst::*;
+use std::fmt::Display;
 
-impl std::fmt::Display for Arg {
+impl Display for Arg {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Arg::Imm(n) => write!(f, "0x{:x}", n),
@@ -11,7 +12,7 @@ impl std::fmt::Display for Arg {
     }
 }
 
-impl std::fmt::Display for Addr {
+impl Display for Addr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(len) = &self.len {
             write!(f, "{} ", len)?;
@@ -23,7 +24,7 @@ impl std::fmt::Display for Addr {
     }
 }
 
-impl std::fmt::Display for RegShft {
+impl Display for RegShft {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match (&self.reg, &self.shft) {
             (Some(reg), Some(n)) => write!(f, "{} + {}", reg, n),
@@ -34,7 +35,7 @@ impl std::fmt::Display for RegShft {
     }
 }
 
-impl std::fmt::Display for Inst {
+impl Display for Inst {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.op)?;
         if let Some(args) = &self.args {

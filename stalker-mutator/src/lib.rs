@@ -3,9 +3,9 @@ use stalker_utils::context::Context;
 use std::boxed::Box;
 
 pub struct AsmMutants {
+    ctx: Box<Context>,
     base: Vec<u8>,
     size: usize,
-    ctx: Box<Context>,
     bit: (usize, usize),
     mask: u8,
 }
@@ -14,16 +14,16 @@ pub trait Mutatable
 where
     Self: Sized,
 {
-    fn mutants(&self, ctx: Option<Context>) -> AsmMutants;
+    fn mutants(&self, ctx: Option<Box<Context>>) -> AsmMutants;
 }
 
 impl Mutatable for Asm {
-    fn mutants(&self, ctx: Option<Context>) -> AsmMutants {
+    fn mutants(&self, ctx: Option<Box<Context>>) -> AsmMutants {
         let ctx = ctx.unwrap_or_default();
         AsmMutants {
             base: self.bytes.to_vec(),
             size: self.size as usize,
-            ctx: Box::new(ctx),
+            ctx: ctx,
             bit: (0, 0),
             mask: 1,
         }
@@ -68,9 +68,9 @@ mod tests {
             for op in locinfo.ops.iter().take(1) {
                 let asm = Asm::from(op);
                 let _ = asm.meta();
-                let _mutants = asm.mutants(Some(Context::default()));
+                let _mutants = asm.mutants(Some(Box::new(Context::default())));
                 for mutant in _mutants {
-                    println!("{:?}", mutant);
+                    println!("{}", mutant);
                 }
             }
         }
