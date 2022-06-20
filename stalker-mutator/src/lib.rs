@@ -1,35 +1,56 @@
 use stalker_utils::asm::Asm;
 use stalker_utils::context::Context;
 
+pub struct AsmMutant {
+    base: Vec<u8>,
+    len: usize,
+    ctx: Context,
+    args: String,
+    bit: (usize, usize),
+    mask: u8,
+}
+
 pub trait Mutatable
 where
     Self: Sized,
 {
-    fn mutants(&self, ctx: Option<Context>) -> Vec<Self>;
+    fn mutants(&self, ctx: Option<Context>) -> AsmMutant;
 }
 
 impl Mutatable for Asm {
-    fn mutants(&self, ctx: Option<Context>) -> Vec<Self> {
-        let mut mutants = vec![];
-        if let Some(mut ctx) = ctx {
-            let args = ctx.config.arch.to_cli_args();
-            for i in 0..self.size {
-                let mut mask: u8 = 1;
-                for _ in 0..8 {
-                    let mut bytes = self.bytes.to_vec();
-                    bytes[i as usize] ^= mask;
-                    let mutant = ctx
-                        .disasm(&args, &bytes)
-                        .expect("Failed at creating mutant.");
-                    println!("{:?}", mutant);
-                    mutants.push(mutant);
-                    mask <<= 1;
-                }
-            }
-        } else {
-            panic!("No context provided.");
+    fn mutants(&self, ctx: Option<Context>) -> AsmMutant {
+        let ctx = ctx.unwrap();
+        let args = ctx.config.arch.to_cli_args();
+        AsmMutant {
+            base: self.bytes.to_vec(),
+            len: self.size as usize,
+            ctx,
+            args,
+            bit: (0, 0),
+            mask: 1,
         }
-        mutants
+    }
+}
+
+impl Iterator for AsmMutant {
+    type Item = Asm;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.bit.1 == 8 {
+            self.bit.0 += 1;
+            (self.mask, self.bit.1) = (1, 0);
+        }
+        if self.bit.0 == self.len {
+            return None;
+        }
+        let mut bytes = self.base.clone();
+        bytes[self.bit.0] ^= self.mask;
+        let mutant = self
+            .ctx
+            .disasm(&self.args, &bytes)
+            .expect("Failed at creating mutant.");
+        self.mask <<= 1;
+        self.bit.1 += 1;
+        Some(mutant)
     }
 }
 
@@ -47,12 +68,15 @@ mod tests {
         for _ in 0..lib.locs.len() {
             snames.push(lib.locs[0].name.clone());
         }
-        for sname in snames.iter() {
+        for sname in snames.iter().take(1) {
             let locinfo = lib.get_locinfo(sname)?;
-            for op in locinfo.ops.iter() {
+            for op in locinfo.ops.iter().take(1) {
                 let asm = Asm::from(op);
-                // let _ = asm.meta();
+                let _ = asm.meta();
                 let _mutants = asm.mutants(Some(Context::default()));
+                for mutant in _mutants {
+                    println!("{:?}", mutant);
+                }
             }
         }
         Ok(())

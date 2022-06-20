@@ -4,7 +4,7 @@ pub struct Inst {
     pub args: Option<Vec<Arg>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Arg {
     Imm(i64),
     Sym(String),
@@ -13,13 +13,13 @@ pub enum Arg {
     Expr(String, String),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct RegShft {
     pub reg: Option<String>,
     pub shft: Option<i64>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Addr {
     pub len: Option<String>,
     pub sel: Option<String>,

@@ -1,5 +1,6 @@
+use super::error::Error;
 use crate::asm::inst::*;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use nom::{
   branch::alt,
   bytes::complete::{tag, take_while1},
@@ -125,17 +126,17 @@ fn insts(input: &str) -> IResult<&str, Vec<Inst>> {
 pub struct AsmParser;
 
 impl AsmParser {
-  pub fn parse(input: &str) -> Result<Inst> {
+  pub fn parse(input: &str) -> Result<Inst, Error> {
     match inst(input) {
       Ok((_, inst)) => Ok(inst),
-      Err(e) => Err(anyhow!("{}", e)),
+      Err(e) => Err(Error::Parse(format!("{}", e))),
     }
   }
 
-  pub fn parse_many(input: &str) -> Result<Vec<Inst>> {
+  pub fn parse_many(input: &str) -> Result<Vec<Inst>, Error> {
     match insts(input) {
       Ok((_, insts)) => Ok(insts),
-      Err(e) => Err(anyhow!("{}", e)),
+      Err(e) => Err(Error::Parse(format!("{}", e))),
     }
   }
 }

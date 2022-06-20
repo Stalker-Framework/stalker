@@ -9,7 +9,7 @@ pub struct Arch {
 impl Default for Arch {
   fn default() -> Self {
     Arch {
-      arch: "x86".into(),
+      arch: "arm".into(),
       bits: 64,
     }
   }
@@ -19,12 +19,6 @@ impl Default for Arch {
 #[serde(default)]
 pub struct StalkerConfig {
   pub arch: Arch,
-}
-
-impl StalkerConfig {
-  pub fn to_cli_args(&self) -> String {
-    self.arch.to_cli_args()
-  }
 }
 
 impl Arch {
