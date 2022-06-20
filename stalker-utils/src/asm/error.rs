@@ -10,4 +10,6 @@ pub enum Error {
     RzPipe(#[from] rzpipe::errors::RzPipeError),
     #[error("hex error")]
     HexDecode(#[from] hex::FromHexError),
+    #[error("io error")]
+    IoError(#[from] std::io::Error),
 }

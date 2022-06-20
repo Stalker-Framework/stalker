@@ -1,25 +1,23 @@
 use stalker_utils::asm::Asm;
 use stalker_utils::context::Context;
-use std::boxed::Box;
 
-pub struct AsmMutants {
-    ctx: Box<Context>,
+pub struct AsmMutants<'a> {
+    ctx: &'a Context,
     base: Vec<u8>,
     size: usize,
     bit: (usize, usize),
     mask: u8,
 }
 
-pub trait Mutatable
+pub trait Mutatable<'a>
 where
     Self: Sized,
 {
-    fn mutants(&self, ctx: Option<Box<Context>>) -> AsmMutants;
+    fn mutants(&self, ctx: &'a Context) -> AsmMutants<'a>;
 }
 
-impl Mutatable for Asm {
-    fn mutants(&self, ctx: Option<Box<Context>>) -> AsmMutants {
-        let ctx = ctx.unwrap_or_default();
+impl<'a> Mutatable<'a> for Asm {
+    fn mutants(&self, ctx: &'a Context) -> AsmMutants<'a> {
         AsmMutants {
             base: self.bytes.to_vec(),
             size: self.size as usize,
@@ -30,7 +28,7 @@ impl Mutatable for Asm {
     }
 }
 
-impl Iterator for AsmMutants {
+impl<'a> Iterator for AsmMutants<'a> {
     type Item = Asm;
     fn next(&mut self) -> Option<Self::Item> {
         if self.bit.1 == 8 {
@@ -67,9 +65,7 @@ mod tests {
             let locinfo = lib.get_locinfo(sname)?;
             for op in locinfo.ops.iter().take(1) {
                 let asm = Asm::from(op);
-                let _ = asm.meta();
-                let _mutants = asm.mutants(Some(Box::new(Context::default())));
-                for mutant in _mutants {
+                for mutant in asm.mutants(&lib.ctx) {
                     println!("{}", mutant);
                 }
             }

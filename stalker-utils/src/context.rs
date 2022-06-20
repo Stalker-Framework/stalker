@@ -4,11 +4,13 @@ use super::fmt;
 use hex::FromHex;
 use rzpipe::RzPipe;
 use std::boxed::Box;
+use std::process::Command;
 
 pub struct Context {
     pub config: StalkerConfig,
     pub rz: Box<RzPipe>,
     arch_cli_arg: String,
+    db: sled::Db,
 }
 
 impl Default for Context {
@@ -21,15 +23,17 @@ impl Default for Context {
             config,
             rz: Box::new(rz),
             arch_cli_arg,
+            db: sled::open("../../data/sled.db").unwrap(),
         }
     }
 }
 
 impl Context {
-    pub fn asm(&mut self, disasm: String) -> Result<Asm> {
-        let c = format!("rz-asm {} {}", self.arch_cli_arg, disasm);
-        let value_s = self.rz.cmd(&c)?;
-        let value = Vec::from_hex(value_s)?;
+    pub fn asm(&self, disasm: String) -> Result<Asm> {
+        let c = Command::new("rz-asm")
+            .args([&self.arch_cli_arg, &disasm])
+            .output();
+        let value = Vec::from_hex(String::from_utf8(c?.stdout).unwrap())?;
         Ok(Asm {
             size: value.len() as u8,
             bytes: value,
@@ -38,10 +42,12 @@ impl Context {
         })
     }
 
-    pub fn disasm(&mut self, value: &[u8]) -> Result<Asm> {
-        let c = format!("rz-asm {} -d {:x?}", self.arch_cli_arg, fmt::hex(value));
+    pub fn disasm(&self, value: &[u8]) -> Result<Asm> {
+        let c = Command::new("rz-asm")
+            .args([&self.arch_cli_arg, "-d", &fmt::hex(value)])
+            .output();
 
-        let disasm = self.rz.cmd(&c)?;
+        let disasm = String::from_utf8(c?.stdout).unwrap();
         let _disasm: Option<String> = if disasm.contains("invalid") {
             None
         } else {
