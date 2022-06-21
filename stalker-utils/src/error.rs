@@ -14,4 +14,6 @@ pub enum Error {
     IoError(#[from] std::io::Error),
     #[error("db error")]
     DbError(#[from] sled::Error),
+    #[error("serde_json error")]
+    Serde(#[from] serde_json::Error),
 }

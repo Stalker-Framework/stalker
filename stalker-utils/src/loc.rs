@@ -75,7 +75,12 @@ impl LibInstance {
 
     pub fn get_locinfo(&mut self, rz: &mut RzPipe, sname: &str) -> Result<LocInfo> {
         rz.cmd(&format!("s {}", sname))?;
-        let loc_info: LocInfo = serde_json::from_str(&rz.cmd("pdfj")?)?;
+        let mut loc_info: LocInfo = serde_json::from_str(&rz.cmd("pdfj")?)?;
+        loc_info.ops = loc_info
+            .ops
+            .into_iter()
+            .filter(|locasm| !locasm.bytes.is_empty())
+            .collect::<Vec<LocAsm>>();
         Ok(loc_info)
     }
 }

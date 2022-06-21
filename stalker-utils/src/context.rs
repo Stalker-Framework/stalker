@@ -16,24 +16,28 @@ pub struct Context {
 
 impl Default for Context {
     fn default() -> Self {
-        let mut rz = RzPipe::spawn("/bin/ls", None).expect("Spawn pipe");
-        rz.cmd("aa").expect("Perform analysis");
-        let mut config = Config::default();
-        let binary_info_s = rz.cmd("ij").expect("");
-        let binary_info: BinaryInfo = serde_json::from_str(&binary_info_s).unwrap();
-        config.arch.arch = binary_info.bin.arch.clone();
-        config.arch.bits = binary_info.bin.bits;
-        Context {
-            config,
-            rz: Box::new(rz),
-            binary_info,
-            db: None,
-            lib: LibInstance::default()
-        }
+        Context::new("/bin/ls").unwrap()
     }
 }
 
 impl Context {
+    pub fn new(lib_path: &str) -> Result<Context> {
+        let mut rz = RzPipe::spawn(lib_path, None).expect("Spawn pipe");
+        rz.cmd("aa")?;
+        let mut config = Config::default();
+        let binary_info_s = rz.cmd("ij")?;
+        let binary_info: BinaryInfo = serde_json::from_str(&binary_info_s)?;
+        config.arch.arch = binary_info.bin.arch.clone();
+        config.arch.bits = binary_info.bin.bits;
+        Ok(Context {
+            config,
+            rz: Box::new(rz),
+            binary_info,
+            db: None,
+            lib: LibInstance::default(),
+        })
+    }
+
     pub fn init_db(&mut self) -> Result<()> {
         if self.db.is_none() {
             let db = Db::new(&self.config.db_path)?;
