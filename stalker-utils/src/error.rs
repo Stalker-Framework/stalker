@@ -12,4 +12,6 @@ pub enum Error {
     HexDecode(#[from] hex::FromHexError),
     #[error("io error")]
     IoError(#[from] std::io::Error),
+    #[error("db error")]
+    DbError(#[from] sled::Error),
 }

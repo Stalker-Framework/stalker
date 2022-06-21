@@ -1,8 +1,13 @@
 pub mod asm;
+pub mod binary;
 pub mod config;
 pub mod context;
+mod db;
+mod error;
 mod fmt;
 pub mod loc;
+
+pub type Result<T, E = error::Error> = core::result::Result<T, E>;
 
 #[cfg(test)]
 mod tests {
@@ -30,8 +35,8 @@ mod tests {
         let builder = Builder::default()
             .collect(from_env())
             .collect(from_file(Toml, "config.toml"))
-            .collect(from_self(config::StalkerConfig::default()));
-        let t: config::StalkerConfig = builder.build()?;
+            .collect(from_self(config::Config::default()));
+        let t: config::Config = builder.build()?;
 
         println!("{:?}", t);
         Ok(())
@@ -49,6 +54,7 @@ mod tests {
             "ret;",
             "sub rdx, qword fs:[rdi + 0x28]",
             "orr x1, xzr, x26, lsl 1",
+            "ldr w8, 0xfffffffffff06a20",
         ];
         for i in insts {
             let ast = asm::AsmParser::parse(i).unwrap();

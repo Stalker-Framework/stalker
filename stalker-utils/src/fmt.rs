@@ -10,7 +10,7 @@ pub fn hex(value: &[u8]) -> String {
 
 impl std::fmt::Display for Asm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "ASM {} value: ", '{')?;
+        write!(f, "ASM {{ value: ",)?;
         for val in &self.bytes {
             write!(f, "{:02x}", val)?;
         }
@@ -19,11 +19,11 @@ impl std::fmt::Display for Asm {
             ", size: {}, disasm: {:?}",
             self.size,
             match &self.disasm {
-                Some(s) => &s,
+                Some(s) => s,
                 None => "invalid",
             }
         )?;
-        write!(f, " {}", '}')?;
+        write!(f, " }}")?;
         Ok(())
     }
 }

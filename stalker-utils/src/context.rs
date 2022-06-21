@@ -1,37 +1,57 @@
-use super::asm::{Asm, Result};
-use super::config::StalkerConfig;
+use super::asm::Asm;
+use super::binary::BinaryInfo;
+use super::config::Config;
+use super::db::Db;
 use super::fmt;
+use super::Result;
 use hex::FromHex;
 use rzpipe::RzPipe;
 use std::boxed::Box;
 use std::process::Command;
 
 pub struct Context {
-    pub config: StalkerConfig,
+    pub config: Config,
+    pub binary_info: BinaryInfo,
     pub rz: Box<RzPipe>,
-    arch_cli_arg: String,
-    db: sled::Db,
+    db: Option<Db>,
 }
 
 impl Default for Context {
     fn default() -> Self {
         let mut rz = RzPipe::spawn("/bin/ls", None).expect("Spawn pipe");
         rz.cmd("aa").expect("Perform analysis");
-        let config = StalkerConfig::default();
-        let arch_cli_arg = config.arch.to_cli_arg();
+        let mut config = Config::default();
+        let binary_info_s = rz.cmd("ij").expect("");
+        let binary_info: BinaryInfo = serde_json::from_str(&binary_info_s).unwrap();
+        config.arch.arch = binary_info.bin.arch.clone();
+        config.arch.bits = binary_info.bin.bits;
         Context {
             config,
             rz: Box::new(rz),
-            arch_cli_arg,
-            db: sled::open("../../data/sled.db").unwrap(),
+            binary_info,
+            db: None,
         }
     }
 }
 
 impl Context {
+    pub fn init_db(&mut self) -> Result<()> {
+        if self.db.is_none() {
+            let db = Db::new(&self.config.db_path)?;
+            self.db = Some(db);
+        }
+        Ok(())
+    }
+
     pub fn asm(&self, disasm: String) -> Result<Asm> {
         let c = Command::new("rz-asm")
-            .args([&self.arch_cli_arg, &disasm])
+            .args([
+                "-a",
+                &self.config.arch.arch,
+                "-b",
+                &self.config.arch.bits.to_string(),
+                &disasm,
+            ])
             .output();
         let value = Vec::from_hex(String::from_utf8(c?.stdout).unwrap())?;
         Ok(Asm {
@@ -44,11 +64,18 @@ impl Context {
 
     pub fn disasm(&self, value: &[u8]) -> Result<Asm> {
         let c = Command::new("rz-asm")
-            .args([&self.arch_cli_arg, "-d", &fmt::hex(value)])
+            .args([
+                "-a",
+                &self.config.arch.arch,
+                "-b",
+                &self.config.arch.bits.to_string(),
+                "-d",
+                &fmt::hex(value),
+            ])
             .output();
 
         let disasm = String::from_utf8(c?.stdout).unwrap();
-        let _disasm: Option<String> = if disasm.contains("invalid") {
+        let _disasm: Option<String> = if disasm.is_empty() || disasm.contains("invalid") {
             None
         } else {
             Some(disasm.replace('\n', ";"))

@@ -21,7 +21,7 @@ impl<'a> Mutatable<'a> for Asm {
         AsmMutants {
             base: self.bytes.to_vec(),
             size: self.size as usize,
-            ctx: ctx,
+            ctx,
             bit: (0, 0),
             mask: 1,
         }
@@ -65,8 +65,9 @@ mod tests {
             let locinfo = lib.get_locinfo(sname)?;
             for op in locinfo.ops.iter().take(1) {
                 let asm = Asm::from(op);
-                for mutant in asm.mutants(&lib.ctx) {
-                    println!("{}", mutant);
+                for mutant in asm.mutants(&mut lib.ctx) {
+                    print!("{}", mutant);
+                    println!("  {:?}", mutant.diff(&asm));
                 }
             }
         }

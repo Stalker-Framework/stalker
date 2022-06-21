@@ -1,8 +1,9 @@
-use super::{
-    error::Error,
+use crate::asm::{
     inst::{Addr, Arg, Inst},
-    Asm, AsmParser, Result,
+    Asm, AsmParser,
 };
+use crate::error::Error;
+use crate::Result;
 
 #[derive(Debug)]
 pub enum InstDiff {

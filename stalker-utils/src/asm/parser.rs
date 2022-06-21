@@ -1,5 +1,5 @@
-use super::error::Error;
 use crate::asm::inst::*;
+use crate::error::Error;
 use anyhow::Result;
 use nom::{
     branch::alt,
@@ -17,7 +17,7 @@ fn op(input: &str) -> IResult<&str, &str> {
 
 fn hex_i64(input: &str) -> IResult<&str, i64> {
     map_res(preceded(tag("0x"), hex_digit1), |out: &str| {
-        i64::from_str_radix(out, 16)
+        i128::from_str_radix(out, 16).map(|a| a as i64)
     })(input)
 }
 

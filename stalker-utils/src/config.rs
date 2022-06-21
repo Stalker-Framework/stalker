@@ -15,17 +15,18 @@ impl Default for Arch {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(default)]
-pub struct StalkerConfig {
+pub struct Config {
     pub arch: Arch,
+    pub db_path: String,
 }
 
-impl Arch {
-    pub fn to_cli_arg(&self) -> String {
-        let mut args = String::new();
-        args += &format!("-a {} ", self.arch);
-        args += &format!("-b {}", self.bits);
-        args
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            arch: Arch::default(),
+            db_path: "/tmp/stalker.db".into(),
+        }
     }
 }
