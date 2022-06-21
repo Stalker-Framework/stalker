@@ -4,7 +4,7 @@ pub mod config;
 pub mod context;
 mod db;
 mod error;
-mod fmt;
+pub mod fmt;
 pub mod loc;
 
 pub type Result<T, E = error::Error> = core::result::Result<T, E>;
@@ -18,14 +18,16 @@ mod tests {
 
     #[test]
     fn test_loc() -> anyhow::Result<()> {
-        let mut lib = loc::LibInstance::default();
-        lib.init_locs()?;
+        let ctx = context::Context::default();
+        let mut lib = ctx.lib;
+        let mut rz = ctx.rz;
+        lib.init_locs(&mut rz)?;
         let mut snames = vec![];
         for _ in 0..lib.locs.len() {
             snames.push(lib.locs[3].name.clone());
         }
         for sname in snames.iter() {
-            let _locinfo = lib.get_locinfo(&sname)?;
+            let _locinfo = lib.get_locinfo(&mut rz, &sname)?;
         }
         Ok(())
     }

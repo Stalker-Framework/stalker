@@ -1,4 +1,5 @@
 use super::asm::Asm;
+use super::config::Arch;
 
 pub fn hex(value: &[u8]) -> String {
     let mut s = String::new();
@@ -24,6 +25,13 @@ impl std::fmt::Display for Asm {
             }
         )?;
         write!(f, " }}")?;
+        Ok(())
+    }
+}
+
+impl std::fmt::Display for Arch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}-{}", self.arch, self.bits)?;
         Ok(())
     }
 }

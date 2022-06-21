@@ -1,19 +1,17 @@
-use super::asm::Asm;
 use super::binary::BinaryInfo;
 use super::config::Config;
 use super::db::Db;
-use super::fmt;
+use super::loc::LibInstance;
 use super::Result;
-use hex::FromHex;
 use rzpipe::RzPipe;
 use std::boxed::Box;
-use std::process::Command;
 
 pub struct Context {
     pub config: Config,
     pub binary_info: BinaryInfo,
     pub rz: Box<RzPipe>,
-    db: Option<Db>,
+    pub db: Option<Db>,
+    pub lib: LibInstance,
 }
 
 impl Default for Context {
@@ -30,6 +28,7 @@ impl Default for Context {
             rz: Box::new(rz),
             binary_info,
             db: None,
+            lib: LibInstance::default()
         }
     }
 }
@@ -41,50 +40,5 @@ impl Context {
             self.db = Some(db);
         }
         Ok(())
-    }
-
-    pub fn asm(&self, disasm: String) -> Result<Asm> {
-        let c = Command::new("rz-asm")
-            .args([
-                "-a",
-                &self.config.arch.arch,
-                "-b",
-                &self.config.arch.bits.to_string(),
-                &disasm,
-            ])
-            .output();
-        let value = Vec::from_hex(String::from_utf8(c?.stdout).unwrap())?;
-        Ok(Asm {
-            size: value.len() as u8,
-            bytes: value,
-            disasm: Some(disasm),
-            mutants: None,
-        })
-    }
-
-    pub fn disasm(&self, value: &[u8]) -> Result<Asm> {
-        let c = Command::new("rz-asm")
-            .args([
-                "-a",
-                &self.config.arch.arch,
-                "-b",
-                &self.config.arch.bits.to_string(),
-                "-d",
-                &fmt::hex(value),
-            ])
-            .output();
-
-        let disasm = String::from_utf8(c?.stdout).unwrap();
-        let _disasm: Option<String> = if disasm.is_empty() || disasm.contains("invalid") {
-            None
-        } else {
-            Some(disasm.replace('\n', ";"))
-        };
-        Ok(Asm {
-            size: value.len() as u8,
-            bytes: value.to_vec(),
-            disasm: _disasm,
-            mutants: None,
-        })
     }
 }

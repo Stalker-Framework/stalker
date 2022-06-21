@@ -2,8 +2,9 @@ use crate::Result;
 use std::collections::HashMap;
 
 pub struct Db {
-    pub mutants: sled::Tree,
+    pub mutant: sled::Tree,
     pub injection: HashMap<&'static str, sled::Tree>,
+    pub instruction: HashMap<&'static str, sled::Tree>,
 }
 
 impl Db {
@@ -11,7 +12,8 @@ impl Db {
         let db = sled::open(db_path)?;
         let db = Db {
             injection: std::collections::HashMap::default(),
-            mutants: db.open_tree("mutants")?,
+            mutant: db.open_tree("mutant")?,
+            instruction: std::collections::HashMap::default(),
         };
         Ok(db)
     }
