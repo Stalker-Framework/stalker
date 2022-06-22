@@ -5,7 +5,7 @@ use hex::FromHex;
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct Arch {
     pub arch: String,
     pub bits: u8,
@@ -20,7 +20,7 @@ impl Default for Arch {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(default)]
 pub struct Config {
     pub arch: Arch,
@@ -31,7 +31,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             arch: Arch::default(),
-            db_path: "/tmp/stalker.db".into(),
+            db_path: "/tmp/stalker".into(),
         }
     }
 }

@@ -16,3 +16,6 @@ edition = "2021"
 "hex" = "*"
 "thiserror" = "*"
 "sled" = "*"
+
+[dev-dependencies]
+crossterm = "*"

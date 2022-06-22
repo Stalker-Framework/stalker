@@ -1,10 +1,11 @@
 use super::asm::Asm;
 use super::config::Arch;
+use std::fmt::Write;
 
 pub fn hex(value: &[u8]) -> String {
     let mut s = String::new();
     for b in value {
-        s.push_str(&format!("{:02x}", b));
+        write!(&mut s, "{:02x}", b).expect("Error occurred while trying to write in hex String");
     }
     s
 }

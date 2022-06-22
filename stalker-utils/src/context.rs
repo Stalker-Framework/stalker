@@ -5,6 +5,7 @@ use super::loc::LibInstance;
 use super::Result;
 use rzpipe::RzPipe;
 use std::boxed::Box;
+use std::path::Path;
 
 pub struct Context {
     pub config: Config,
@@ -40,9 +41,18 @@ impl Context {
 
     pub fn init_db(&mut self) -> Result<()> {
         if self.db.is_none() {
-            let db = Db::new(&self.config.db_path)?;
+            let db = Db::new(self, &self.config.db_path)?;
             self.db = Some(db);
         }
         Ok(())
+    }
+
+    pub fn identity(&self) -> String {
+        let file = Path::new(&self.binary_info.core.file);
+        let filename = file.file_name().unwrap().to_str().unwrap();
+        format!(
+            "{}-{}-{}",
+            &self.config.arch, &self.binary_info.bin.os, &filename
+        )
     }
 }
