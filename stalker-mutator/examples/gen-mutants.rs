@@ -28,12 +28,7 @@ fn main() -> Result<()> {
             }
             for op in locinfo.unwrap().ops.iter() {
                 let asm = Asm::from(op);
-                if let Ok(Some(_)) = db.mutant.get(format!(
-                    "{}_{}_{:02x}",
-                    ctx.config.arch,
-                    hex(&asm.bytes),
-                    asm.size * 8 - 1
-                )) {
+                if let Ok(Some(_)) = db.mutant.get(asm.key(&ctx.config.arch, asm.size * 8 - 1)) {
                     continue;
                 } else {
                     for (i, mutant) in asm
@@ -41,7 +36,7 @@ fn main() -> Result<()> {
                         .enumerate()
                     {
                         let m = mutant.unwrap();
-                        let key = format!("{}_{}_{:02x}", ctx.config.arch, hex(&asm.bytes), i);
+                        let key = asm.key(&ctx.config.arch, i as u8);
                         let val = format!(
                             "{}_{}",
                             hex(&m.bytes),

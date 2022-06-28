@@ -88,6 +88,7 @@ mod tests {
     #[test]
     fn test_db() -> Result<()> {
         let mut ctx = Context::default();
+        ctx.config.db_path = String::from("/tmp/stalker");
         ctx.lib.init_locs(&mut ctx.rz)?;
         ctx.init_db()?;
         if let Some(db) = ctx.db {
@@ -132,15 +133,4 @@ mod tests {
         }
         Ok(())
     }
-
-    // #[test]
-    // fn test_db_read() -> Result<()> {
-    //     let mut ctx = Context::default();
-    //     ctx.init_db()?;
-    //     if let Some(db) = ctx.db {
-    //         let a = db.mutant.get("arm-64_08510318_01")?;
-    //         println!("{:?}", a.map(|v| String::from_utf8(v.to_vec())));
-    //     }
-    //     Ok(())
-    // }
 }

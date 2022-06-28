@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 stalker-utils = { path= "../stalker-utils" }
-anyhow = "*"
+anyhow = "1.0.57"
 
 [dev-dependencies]
-crossterm = "*"
+crossterm = "0.23.2"

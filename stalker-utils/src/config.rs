@@ -31,7 +31,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             arch: Arch::default(),
-            db_path: "/tmp/stalker".into(),
+            db_path: "data/stalker".into(),
         }
     }
 }

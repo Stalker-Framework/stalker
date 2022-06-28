@@ -18,8 +18,10 @@ fn main() -> Result<()> {
     if let Some(db) = ctx.db {
         let locs = ctx.lib.locs.to_vec();
         let cnt = locs.len();
+        let locs_tree = db.instruction.open_tree(&"locs")?;
         for (i, loc) in locs.iter().enumerate() {
             println!("{:2}/{:2} {}", i, cnt, &loc.name);
+            locs_tree.insert(i.to_be_bytes(), loc.name.as_str())?;
             let locinfo = ctx.lib.get_locinfo(&mut ctx.rz, &loc.name);
             let tree = db.instruction.open_tree(&loc.name)?;
             if locinfo.is_err() {
