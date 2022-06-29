@@ -3,6 +3,7 @@ use anyhow::Result;
 use rzpipe::RzPipe;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
+use sled::IVec;
 use std::convert::From;
 
 #[derive(Default)]
@@ -26,7 +27,7 @@ pub struct LocInfo {
 }
 
 #[serde_as]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LocAsm {
     #[serde_as(as = "serde_with::hex::Hex")]
     pub bytes: Vec<u8>,
@@ -53,6 +54,19 @@ impl From<&LocAsm> for Asm {
             disasm: asm.disasm.clone(),
             size: asm.size,
             mutants: None,
+        }
+    }
+}
+
+impl From<(&IVec, Asm)> for LocAsm {
+    fn from(t: (&IVec, Asm)) -> LocAsm {
+        let offset_str = String::from_utf8_lossy(t.0);
+        let offset = usize::from_str_radix(&offset_str, 16).unwrap();
+        LocAsm {
+            bytes: t.1.bytes.clone(),
+            disasm: t.1.disasm.clone(),
+            size: t.1.size,
+            offset,
         }
     }
 }

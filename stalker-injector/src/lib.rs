@@ -1,16 +1,17 @@
+mod fmt;
 use sled::Tree;
-use stalker_utils::{asm::Asm, config::Arch, context::Context};
+use stalker_utils::{asm::Asm, config::Arch, context::Context, loc::LocAsm};
 
 pub struct Injection {
     arch: Arch,
     mutant: Tree,
-    asm: Option<Asm>,
+    loc_asm: Option<LocAsm>,
     locs_iter: sled::Iter,
     index: u8,
 }
 
 #[derive(Debug)]
-pub struct Change(Asm);
+pub struct Change(LocAsm, Asm);
 
 pub trait Injectable {
     fn inject(&self, loc_name: &str) -> Injection;
@@ -33,12 +34,24 @@ impl Injection {
             Injection {
                 arch: ctx.config.arch.clone(),
                 mutant,
-                asm,
+                loc_asm: asm,
                 locs_iter,
                 index: 0,
             }
         } else {
             panic!("Uninitialized db.")
+        }
+    }
+
+    fn increment(&mut self, asm: Option<Asm>, loc_asm: LocAsm) -> Option<Change> {
+        let asm: Asm = asm.unwrap_or_else(|| loc_asm.clone().into());
+        let key = asm.key(&self.arch, self.index as u8);
+        self.index += 1;
+        if let Ok(Some(value)) = self.mutant.get(&key) {
+            let chg_asm = Asm::from(&value);
+            Some(Change(loc_asm, chg_asm))
+        } else {
+            self.next()
         }
     }
 }
@@ -47,37 +60,29 @@ impl Iterator for Injection {
     type Item = Change;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.asm.is_none() {
+        if self.loc_asm.is_none() {
             // process new loc
-            if let Some(Ok((_, value))) = self.locs_iter.next() {
+            if let Some(Ok((offset, value))) = self.locs_iter.next() {
+                // update current loc
                 let asm = Asm::from(&value);
-                let key = asm.key(&self.arch, self.index as u8);
-                self.index += 1; // update index
-                self.asm = Some(asm); // update cur asm
-                if let Ok(Some(value)) = self.mutant.get(&key) {
-                    let chg_asm = Asm::from(&value);
-                    Some(Change(chg_asm))
-                } else {
-                    self.next()
-                }
+                let loc_asm = LocAsm::from((&offset, asm.clone()));
+                self.loc_asm = Some(loc_asm.clone());
+                self.increment(Some(asm), loc_asm)
             } else {
+                // no new loc, end of the iteration
                 None
             }
         } else {
-            let asm = self.asm.as_ref().unwrap();
-            if self.index == asm.size * 8 {
-                self.asm = None;
+            // process current loc
+            let loc_asm = self.loc_asm.clone().unwrap();
+            if self.index == loc_asm.size * 8 {
+                // no more mutants, reset the index and prepare for a new loc
+                self.loc_asm = None;
                 self.index = 0;
                 self.next()
             } else {
-                let key = asm.key(&self.arch, self.index as u8);
-                self.index += 1; // update index
-                if let Ok(Some(value)) = self.mutant.get(&key) {
-                    let chg_asm = Asm::from(&value);
-                    Some(Change(chg_asm))
-                } else {
-                    self.next()
-                }
+                // more mutants
+                self.increment(None, loc_asm)
             }
         }
     }
