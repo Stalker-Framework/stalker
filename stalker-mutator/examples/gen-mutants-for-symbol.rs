@@ -14,18 +14,20 @@ use std::io::stdout;
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     let mut ctx = Context::new(args.get(1).unwrap_or(&String::from("/bin/ls")))?;
+    let default_function_name = String::from("main");
+    let target_function_name = args.get(2).unwrap_or(&default_function_name);
 
     ctx.lib.init_locs(&mut ctx.rz)?;
     ctx.init_db()?;
     if let Some(db) = ctx.db {
         let locs = ctx.lib.locs.to_vec();
-        let cnt = locs.len();
-        for (i, loc) in locs.iter().enumerate() {
-            println!("{:2}/{:2} {}", i, cnt, &loc.name);
+        if let Some(loc) = locs.iter().find(|l| &l.name == target_function_name) {
             let locinfo = ctx.lib.get_locinfo(&mut ctx.rz, &loc.name);
             if locinfo.is_err() {
-                continue;
+                panic!("Db not initialized.");
             }
+            println!("Found symbol {}", &loc.name);
+            println!("Processing...");
             for op in locinfo.unwrap().ops.iter() {
                 let asm = Asm::from(op);
                 if let Ok(Some(_)) = db.mutant.get(asm.key(&ctx.config.arch, asm.size * 8 - 1)) {

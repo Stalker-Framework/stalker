@@ -21,4 +21,8 @@ impl Db {
         };
         Ok(db)
     }
+
+    pub fn list_injections(&self) {
+        
+    }
 }

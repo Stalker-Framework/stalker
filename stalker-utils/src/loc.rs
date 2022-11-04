@@ -75,10 +75,10 @@ impl LibInstance {
     pub fn init_locs(&mut self, rz: &mut RzPipe) -> Result<()> {
         if self.locs.is_empty() {
             rz.cmd("fs functions")?;
-            let mut f_locs: Vec<Loc> = serde_json::from_str(&rz.cmd("fj")?)?;
+            let mut f_locs: Vec<Loc> = serde_json::from_str(&rz.cmd("flj")?)?;
 
             rz.cmd("fs symbols")?;
-            let mut s_locs: Vec<Loc> = serde_json::from_str(&rz.cmd("fj")?)?;
+            let mut s_locs: Vec<Loc> = serde_json::from_str(&rz.cmd("flj")?)?;
 
             self.locs.append(&mut f_locs);
             self.locs.append(&mut s_locs);
