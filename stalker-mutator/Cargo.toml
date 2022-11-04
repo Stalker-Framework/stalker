@@ -8,6 +8,3 @@ edition = "2021"
 [dependencies]
 stalker-utils = { path= "../stalker-utils" }
 anyhow = "1.0.57"
-
-[dev-dependencies]
-crossterm = "0.23.2"

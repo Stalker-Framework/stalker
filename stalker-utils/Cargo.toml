@@ -11,11 +11,10 @@ edition = "2021"
 "serde_json" = "1.0.81"
 "serde_with" = { version = "1.14.0", features = ["hex"] }
 "anyhow" = "1.0.57"
-"serfig" = "0.0.2"
+"serfig" = "0.0.3"
 "nom" = "7.1.1"
 "hex" = "0.4.3"
 "thiserror" = "1.0.31"
 "sled" = "0.34.7"
 
 [dev-dependencies]
-crossterm = "0.23.2"

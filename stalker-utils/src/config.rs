@@ -76,3 +76,42 @@ impl Arch {
         })
     }
 }
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[serde(default)]
+pub struct LibConfig {
+    pub path: String,
+    pub syms: SymConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub enum SymConfig {
+    Filter(String),
+    Matches(Vec<String>),
+}
+
+impl Default for SymConfig {
+    fn default() -> Self {
+        SymConfig::Filter(String::from("aes"))
+    }
+}
+
+impl Default for LibConfig {
+    fn default() -> Self {
+        LibConfig {
+            path: String::from("../cryptolibs/dist/libgcrypt/lib/libgcrypt.so"),
+            syms: Default::default(),
+        }
+    }
+}
+
+impl SymConfig {
+    pub fn predicate<'a>(&'a self) -> Box<dyn Fn(&str) -> bool + 'a> {
+        match self {
+            SymConfig::Filter(target) => Box::new(move |x: &str| x.contains(target)),
+            SymConfig::Matches(targets) => {
+                Box::new(move |x: &str| targets.into_iter().any(|t| t == x))
+            }
+        }
+    }
+}
