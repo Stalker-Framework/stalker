@@ -13,7 +13,7 @@ pub fn gen(ctx: &mut Context) -> Result<()> {
     let locs_tree = db.instruction.open_tree(&"locs")?;
     info!("Openning db.");
     for (i, loc) in locs.iter().enumerate() {
-        debug!("{:2}/{:2} {}", i, cnt, &loc.name);
+        info!("{:2}/{:2} {}", i, cnt, &loc.name);
         locs_tree.insert(i.to_be_bytes(), loc.name.as_str())?;
         let locinfo = ctx.lib.get_locinfo(&mut ctx.rz, &loc.name);
         let tree = db.instruction.open_tree(&loc.name)?;

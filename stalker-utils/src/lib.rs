@@ -12,9 +12,6 @@ pub type Result<T, E = error::Error> = core::result::Result<T, E>;
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serfig::collectors::{from_env, from_file, from_self};
-    use serfig::parsers::Toml;
-    use serfig::Builder;
 
     #[test]
     fn test_loc() -> anyhow::Result<()> {
@@ -29,18 +26,6 @@ mod tests {
         for sname in snames.iter() {
             let _locinfo = lib.get_locinfo(&mut rz, &sname)?;
         }
-        Ok(())
-    }
-
-    #[test]
-    fn test_config() -> anyhow::Result<()> {
-        let builder = Builder::default()
-            .collect(from_env())
-            .collect(from_file(Toml, "config.toml"))
-            .collect(from_self(config::Config::default()));
-        let t: config::Config = builder.build()?;
-
-        println!("{:?}", t);
         Ok(())
     }
 

@@ -1,4 +1,7 @@
+mod config;
+mod exec;
 mod fmt;
+pub use config::InjectionConfig;
 use sled::Tree;
 use stalker_utils::{asm::Asm, config::Arch, context::Context, loc::LocAsm};
 
@@ -11,7 +14,7 @@ pub struct Injection {
 }
 
 #[derive(Debug)]
-pub struct Change(LocAsm, Asm);
+pub struct Change(LocAsm, Asm, u8);
 
 pub trait Injectable {
     fn inject(&self, loc_name: &str) -> Injection;
@@ -49,7 +52,7 @@ impl Injection {
         self.index += 1;
         if let Ok(Some(value)) = self.mutant.get(&key) {
             let chg_asm = Asm::from(&value);
-            Some(Change(loc_asm, chg_asm))
+            Some(Change(loc_asm, chg_asm, self.index))
         } else {
             self.next()
         }

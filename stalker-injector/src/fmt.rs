@@ -20,7 +20,7 @@ impl std::fmt::Display for Change {
         writeln!(f, "Change: {{ offset: {:08x} }}", self.0.offset)?;
         let asm: Asm = (&self.0).into();
         writeln!(f, "  from: {}", asm)?;
-        writeln!(f, "    to: {}", self.1)?;
+        write!(f, "    to: {}", self.1)?;
         Ok(())
     }
 }

@@ -10,7 +10,7 @@ pub struct Db {
 
 impl Db {
     pub fn new(ctx: &Context, db_path: &str) -> Result<Db> {
-        let identity = &ctx.identity();
+        let identity = &ctx.id();
         create_dir_all(format!("{}/mutant", db_path))?;
         create_dir_all(format!("{}/target/{}", db_path, identity))?;
         let mutant_db = sled::open(format!("{}/mutant", db_path))?;
@@ -22,7 +22,5 @@ impl Db {
         Ok(db)
     }
 
-    pub fn list_injections(&self) {
-        
-    }
+    pub fn list_injections(&self) {}
 }

@@ -24,14 +24,18 @@ impl Default for Arch {
 #[serde(default)]
 pub struct Config {
     pub arch: Arch,
+    pub os: String,
     pub db_path: String,
+    pub rz_path: String,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Config {
             arch: Arch::default(),
+            os: "linux".into(),
             db_path: "data/stalker".into(),
+            rz_path: "data/stalker/rizin".into(),
         }
     }
 }
@@ -81,6 +85,7 @@ impl Arch {
 #[serde(default)]
 pub struct LibConfig {
     pub path: String,
+    pub link_name: String,
     pub syms: SymConfig,
 }
 
@@ -99,7 +104,8 @@ impl Default for SymConfig {
 impl Default for LibConfig {
     fn default() -> Self {
         LibConfig {
-            path: String::from("../cryptolibs/dist/libgcrypt/lib/libgcrypt.so"),
+            path: String::from("../cryptolibs/dist/libgcrypt/lib/libgcrypt.so.20.3.4"),
+            link_name: String::from("libgcrypt.so"),
             syms: Default::default(),
         }
     }

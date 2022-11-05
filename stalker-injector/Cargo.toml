@@ -10,4 +10,7 @@ stalker-utils = { path= "../stalker-utils" }
 stalker-mutator = { path= "../stalker-mutator" }
 anyhow = "1.0.57"
 sled = "0.34.7"
-
+log = "0.4.17"
+"serde" = "1.0.137"
+"serde_json" = "1.0.81"
+"serde_with" = { version = "1.14.0", features = ["hex"] }

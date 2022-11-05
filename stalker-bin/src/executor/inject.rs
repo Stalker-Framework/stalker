@@ -1,12 +1,11 @@
 use anyhow::Result;
-use log::debug;
-use stalker_injector::Injectable;
-use stalker_utils::context::Context;
+use stalker_injector::{Injectable, InjectionConfig};
+use stalker_utils::{config::LibConfig, context::Context};
 
-pub fn exec(ctx: &mut Context, func_name: &str) -> Result<()> {
-    let injection = ctx.inject(func_name);
-    for i in injection.take(64) {
-        debug!("{}", i);
+pub fn exec(ctx: &mut Context, lib_config: &LibConfig, inj_config: &InjectionConfig) -> Result<()> {
+    let injection = ctx.inject(&inj_config.target_sym);
+    for i in injection {
+        i.perform(ctx, lib_config, &inj_config)?;
     }
     Ok(())
 }
