@@ -1,10 +1,10 @@
 mod executor;
 mod generator;
-use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 use env_logger::Env;
 use log::info;
+use serde::{Deserialize, Serialize};
 use serfig::collectors::{from_file, from_self};
 use serfig::parsers::Toml;
 use serfig::Builder;
@@ -17,11 +17,14 @@ use stalker_utils::context::Context;
 #[command(author, version, about, long_about = None)]
 struct Cli {
     /// Number of times to greet
-    #[arg(short, long, value_name = "FILE")]
-    config: Option<PathBuf>,
+    #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/config.toml"))]
+    config: String,
 
-    #[arg(short, long, value_name = "FILE")]
-    lib_config: Option<PathBuf>,
+    #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/lib.toml"))]
+    lib_config: String,
+
+    #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/inject.toml"))]
+    inj_config: String,
 
     /// Turn logging on
     #[arg(short, long, action = clap::ArgAction::Count)]
@@ -38,17 +41,24 @@ enum Commands {
     Inject,
 }
 
+#[derive(Debug, Default, Serialize, Deserialize, Clone)]
+struct CliConfig {
+    platform: Config,
+    lib: LibConfig,
+    injection: InjectionConfig,
+}
+
 fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     let lib_builder = Builder::default()
-        .collect(from_self(LibConfig::default()))
-        .collect(from_file(Toml, "config/lib.toml"));
+        .collect(from_file(Toml, &cli.lib_config))
+        .collect(from_self(LibConfig::default()));
     let inj_builder = Builder::default()
-        .collect(from_self(InjectionConfig::default()))
-        .collect(from_file(Toml, "config/inject.toml"));
+        .collect(from_file(Toml, &cli.inj_config))
+        .collect(from_self(InjectionConfig::default()));
     let builder = Builder::default()
-        .collect(from_self(Config::default()))
-        .collect(from_file(Toml, "config/platform.toml"));
+        .collect(from_file(Toml, &cli.config))
+        .collect(from_self(Config::default()));
 
     let env = match cli.verbose {
         0 => Env::default().default_filter_or("warn,sled=error,serfig=error"),

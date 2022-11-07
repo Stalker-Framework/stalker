@@ -86,7 +86,7 @@ impl Arch {
 pub struct LibConfig {
     pub path: String,
     pub link_name: String,
-    pub syms: SymConfig,
+    pub syms: Vec<SymConfig>,
 }
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -114,7 +114,7 @@ impl Default for LibConfig {
 impl SymConfig {
     pub fn predicate<'a>(&'a self) -> Box<dyn Fn(&str) -> bool + 'a> {
         match self {
-            SymConfig::Filter(target) => Box::new(move |x: &str| x.contains(target)),
+            SymConfig::Filter(target) => Box::new(move |x: &str| x.to_lowercase().contains(target)),
             SymConfig::Matches(targets) => {
                 Box::new(move |x: &str| targets.into_iter().any(|t| t == x))
             }

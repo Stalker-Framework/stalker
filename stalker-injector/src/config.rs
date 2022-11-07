@@ -11,6 +11,7 @@ pub struct InjectionConfig {
     pub name: String,
     pub target_sym: String,
     pub exec_command: String,
+    pub exec_args: Vec<String>,
     pub dry_run: bool,
 }
 
@@ -21,6 +22,7 @@ impl Default for InjectionConfig {
             name: "aes".into(),
             target_sym: "sym._gcry_aes_cfb_enc_armv8_ce".into(),
             exec_command: "./bin".into(),
+            exec_args: vec![],
             dry_run: true,
         }
     }

@@ -12,7 +12,10 @@ pub fn gen(ctx: &mut Context, lib_config: &LibConfig) -> Result<()> {
         .db
         .as_ref()
         .expect("Context Db should be initialized first.");
-    for loc in locs.iter().filter(|x| lib_config.syms.predicate()(&x.name)) {
+    for loc in locs
+        .iter()
+        .filter(|x| lib_config.syms.iter().any(|f| f.predicate()(&x.name)))
+    {
         if let Ok(locinfo) = ctx.lib.get_locinfo(&mut ctx.rz, &loc.name) {
             info!("Found symbol {}", &loc.name);
             for op in locinfo.ops.iter() {

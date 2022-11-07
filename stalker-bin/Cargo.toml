@@ -16,3 +16,4 @@ stalker-injector = { path= "../stalker-injector" }
 log = "0.4.17"
 env_logger = "0.9.1"
 clap = { version = "4.0.18", features = ["derive"] }
+rayon = "1.5.3"
