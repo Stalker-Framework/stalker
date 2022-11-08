@@ -1,0 +1,6 @@
+work_dir = "examples/openssl/modes"
+name = "modes-ctr-armv8"
+target_syms = ["sym.aes_v8_ctr32_encrypt_blocks"]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

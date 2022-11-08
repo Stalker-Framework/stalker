@@ -1,0 +1,9 @@
+work_dir = "examples/libgcrypt/aes"
+name = "aes-ecb"
+target_syms = [
+    "sym._gcry_aes_arm_encrypt_block",
+    "sym._gcry_aes_arm_decrypt_block",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

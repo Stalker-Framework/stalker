@@ -1,0 +1,24 @@
+path = "../cryptolibs/dist/libgcrypt/lib/libgcrypt.so.20.3.4"
+link_name = "libgcrypt.so.20"
+syms = [
+    # { Filter = "ecdsa" },
+    # { Filter = "aes" },
+    # { Filter = "cbc" },
+    # { Filter = "ctr" },
+    # { Filter = "salsa" },
+    { Matches = [
+        "sym._gcry_dsa_gen_k",
+        "sym._gcry_aes_arm_encrypt_block",
+        "sym._gcry_aes_arm_decrypt_block",
+    ] },
+    { Matches = [
+        "sym._gcry_aes_armv8_ce_setkey",
+        "sym._gcry_aes_armv8_ce_prepare_decryption",
+        "sym._gcry_aes_armv8_ce_encrypt",
+        "sym._gcry_aes_armv8_ce_decrypt",
+        "sym._gcry_aes_enc_armv8_ce",
+        "sym._gcry_aes_dec_armv8_ce",
+        "sym._gcry_aes_sbox4_armv8_ce",
+        "sym._gcry_aes_invmixcol_armv8_ce",
+    ] },
+]

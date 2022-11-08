@@ -1,0 +1,6 @@
+work_dir = "examples/openssl/ecdsa"
+name = "ecdsa-sign"
+target_syms = ["sym.ECDSA_sign_setup"]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

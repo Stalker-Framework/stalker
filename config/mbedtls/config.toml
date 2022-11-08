@@ -1,0 +1,14 @@
+path = "../cryptolibs/dist/mbedtls/lib/libmbedcrypto.so.11"
+link_name = "libmbedcrypto.so.11"
+syms = [
+    { Matches = [
+        "sym.mbedtls_aes_crypt_ctr",
+        "sym.mbedtls_ecp_gen_privkey",
+        "sym.mbedtls_ecdsa_sign",
+        "sym.ecdsa_sign_wrap",
+        "sym.aes_crypt_cbc_wrap",
+        "sym.mbedtls_aes_crypt_cbc",
+        "sym.aes_crypt_ctr_wrap",
+        "sym.mbedtls_aes_crypt_ctr",
+    ] },
+]

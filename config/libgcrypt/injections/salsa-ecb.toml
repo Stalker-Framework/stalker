@@ -1,0 +1,17 @@
+work_dir = "examples/libgcrypt/aes"
+name = "aes-ecb"
+target_syms = [
+    "sym.salsa20_core",
+    "sym.salsa20_do_encrypt_stream",
+    "sym.salsa20_encrypt_stream",
+    "sym.salsa20_ivsetup",
+    "sym.salsa20_keysetup",
+    "sym.salsa20_setiv",
+    "sym.salsa20_setkey",
+    "sym._gcry_salsa20_amd64_keysetup",
+    "sym._gcry_salsa20_amd64_ivsetup",
+    "sym._gcry_salsa20_amd64_encrypt_blocks",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

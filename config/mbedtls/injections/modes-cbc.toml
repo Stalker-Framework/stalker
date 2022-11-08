@@ -1,0 +1,9 @@
+work_dir = "examples/mbedtls/modes"
+name = "modes-cbc"
+target_syms = [
+    "sym.aes_crypt_cbc_wrap",
+    "sym.mbedtls_aes_crypt_cbc",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

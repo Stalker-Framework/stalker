@@ -29,6 +29,10 @@ struct Cli {
     /// Turn logging on
     #[arg(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
+
+    /// Turn logging on
+    #[arg(short, default_value_t = true)]
+    parallel: bool,
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -92,7 +96,7 @@ fn main() -> anyhow::Result<()> {
         }
         Some(Commands::Inject) => {
             inj_config.init(&ctx, &lib_config)?;
-            executor::inject::exec(&mut ctx, &lib_config, &inj_config)?;
+            executor::inject::exec(&mut ctx, &lib_config, &inj_config, cli.parallel)?;
         }
         None => {}
     }

@@ -1,0 +1,18 @@
+work_dir = "examples/libgcrypt/aes"
+target_syms = [
+    "sym._gcry_aes_ssse3_encrypt",
+    "sym._gcry_aes_ssse3_do_setkey",
+    "sym._gcry_aes_ssse3_decrypt",
+    "sym._gcry_aes_ssse3_encrypt_core",
+    "sym._gcry_aes_ssse3_decrypt_core",
+    "sym._gcry_aes_ssse3_schedule_core",
+    "sym._gcry_aes_ssse3_enc_preload",
+    "sym._gcry_aes_ssse3_dec_preload",
+    "loc._aes_encrypt_core",
+    "loc._aes_decrypt_core",
+    "loc._aes_schedule_core",
+]
+name = "aes-sse3"
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

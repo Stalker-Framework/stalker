@@ -1,0 +1,8 @@
+work_dir = "examples/libgcrypt/modes"
+name = "modes-ctr"
+target_syms = [
+    "sym._gcry_cipher_ctr_encrypt",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

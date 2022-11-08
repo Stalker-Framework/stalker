@@ -90,14 +90,12 @@ pub fn inspect<T: Display + Effect + VariantNames + AsRef<str> + EnumProperty>(
 }
 
 pub fn process_dir<T: Effect>(
-    prefix: &Path,
+    path: &Path,
     expect_path: Option<&str>,
-    symbol: &str,
     group_size: usize,
 ) -> Vec<(String, Result<T, ParseError>)> {
-    let expect = expect_path
-        .map(|expect_p| Fields::from_file(prefix.join(symbol).join(expect_p), group_size).unwrap());
-    let path = prefix.join(symbol).join("output");
+    let expect =
+        expect_path.map(|expect_p| Fields::from_file(path.join(expect_p), group_size).unwrap());
 
     let mut res_files = read_dir(path).unwrap();
     let mut res_vec: Vec<(String, Result<T, ParseError>)> = vec![];

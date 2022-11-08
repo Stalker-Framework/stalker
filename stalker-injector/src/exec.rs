@@ -1,6 +1,6 @@
 use crate::{Change, InjectionConfig};
 use anyhow::Result;
-use log::{debug, info};
+use log::{debug, info, warn};
 use stalker_utils::config::LibConfig;
 use stalker_utils::context::Context;
 use stalker_utils::fmt::hex;
@@ -24,9 +24,31 @@ impl Change {
         if inj_config.dry_run {
             Ok(())
         } else {
+            // Output texts files
+            let f_bdr = |name: &str| {
+                format!(
+                    "data/stalker/output/{}/{}/{}.{}",
+                    ctx.id(),
+                    &inj_config.name,
+                    self.id(),
+                    name
+                )
+            };
+            let stdout_fs = f_bdr("stdout");
+            let stderr_fs = f_bdr("stderr");
+            let fail_fs = f_bdr("fail");
+            let stdout_f = Path::new(&stdout_fs);
+            let stderr_f = Path::new(&stderr_fs);
+            let fail_f = Path::new(&fail_fs);
+
+            if stdout_f.exists() || stderr_f.exists() || fail_f.exists() {
+                warn!("Result file exists, skipping.");
+                return Ok(());
+            }
+            // Binary files
             let origin = Path::new(&ctx.binary_info.core.file);
-            let load = format!("data/stalker/load/{}/", &self.id());
-            let new = format!("{}{}", &load, &lib_config.link_name);
+            let load = format!("/tmp/{}", &self.id());
+            let new = format!("{}/{}", &load, &lib_config.link_name);
 
             create_dir(&load)?;
             info!(
@@ -37,28 +59,15 @@ impl Change {
             // Create
             copy(origin, &new)?;
             self.edit(&new)?;
+
             // Run
             let res = Command::new(&inj_config.exec_command)
                 .args(&inj_config.exec_args)
                 .current_dir(&inj_config.work_dir)
-                .env("LD_LIBRARY_PATH", &format!("../../../{}", &load))
+                .env("LD_LIBRARY_PATH", &load)
                 .output();
             match res {
                 Ok(res) => {
-                    let stdout_f = format!(
-                        "data/stalker/output/{}/{}/{}/{}.stdout",
-                        ctx.id(),
-                        lib_config.link_name,
-                        &inj_config.name,
-                        &self.id()
-                    );
-                    let stderr_f = format!(
-                        "data/stalker/output/{}/{}/{}/{}.stderr",
-                        ctx.id(),
-                        lib_config.link_name,
-                        &inj_config.name,
-                        &self.id()
-                    );
                     if !res.stdout.is_empty() {
                         let mut of = File::create(&stdout_f)?;
                         of.write_all(&res.stdout)?;
@@ -71,13 +80,6 @@ impl Change {
                     }
                 }
                 Err(e) => {
-                    let fail_f = format!(
-                        "data/stalker/output/{}/{}/{}/{}.fail",
-                        ctx.id(),
-                        lib_config.link_name,
-                        &inj_config.name,
-                        &self.id()
-                    );
                     let mut f = File::create(&fail_f)?;
                     f.write_all(&e.to_string().as_bytes())?;
                 }

@@ -1,0 +1,5 @@
+[arch]
+arch = "arm"
+bits = 64
+
+os = "linux"

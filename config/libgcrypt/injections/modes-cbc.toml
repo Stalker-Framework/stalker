@@ -1,0 +1,6 @@
+work_dir = "examples/libgcrypt/modes"
+name = "modes-cbc"
+target_syms = ["sym._gcry_cipher_cbc_encrypt", "sym._gcry_cipher_cbc_decrypt"]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

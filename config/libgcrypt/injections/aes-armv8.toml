@@ -1,0 +1,15 @@
+work_dir = "examples/libgcrypt/aes"
+name = "aes-armv8"
+target_syms = [
+    "sym._gcry_aes_armv8_ce_setkey",
+    "sym._gcry_aes_armv8_ce_prepare_decryption",
+    "sym._gcry_aes_armv8_ce_encrypt",
+    "sym._gcry_aes_armv8_ce_decrypt",
+    "sym._gcry_aes_enc_armv8_ce",
+    "sym._gcry_aes_dec_armv8_ce",
+    "sym._gcry_aes_sbox4_armv8_ce",
+    "sym._gcry_aes_invmixcol_armv8_ce",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

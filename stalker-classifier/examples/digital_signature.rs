@@ -11,8 +11,8 @@ fn main() -> Result<()> {
 
     let arch = args.get(1).expect("No arch specified.");
 
-    let config = load_config("examples/config/dsa.yaml");
-    analyze::<T>(&config, arch, show_patches, "results");
+    let config = load_config("config/experiments/dsa.yaml");
+    analyze::<T>(&config, arch, show_patches, "data/stalker/output/");
 
     Ok(())
 }
