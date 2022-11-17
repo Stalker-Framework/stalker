@@ -1,4 +1,4 @@
-work_dir = "examples/openssl/modes"
+work_dir = "examples/openssl/modes-cbc"
 name = "modes-cbc-vpaes"
 target_syms = ["sym.vpaes_cbc_encrypt", "sym.vpaes_cbc_decrypt"]
 exec_command = "/usr/bin/timeout"

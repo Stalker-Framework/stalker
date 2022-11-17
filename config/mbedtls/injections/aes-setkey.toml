@@ -1,0 +1,9 @@
+work_dir = "examples/mbedtls/aes"
+name = "aes-setkey"
+target_syms = [
+    "sym.mbedtls_aes_setkey_dec",
+    "sym.mbedtls_aes_setkey_enc",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

@@ -1,0 +1,9 @@
+work_dir = "examples/mbedtls/aes"
+name = "aes-internal"
+target_syms = [
+    "sym.mbedtls_internal_aes_encrypt",
+    "sym.mbedtls_internal_aes_decrypt",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

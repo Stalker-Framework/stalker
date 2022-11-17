@@ -1,4 +1,4 @@
-work_dir = "examples/openssl/modes"
+work_dir = "examples/openssl/modes-cbc"
 name = "modes-cbc-armv8"
 target_syms = ["sym.aes_v8_cbc_encrypt"]
 exec_command = "/usr/bin/timeout"

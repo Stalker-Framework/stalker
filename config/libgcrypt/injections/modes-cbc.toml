@@ -1,4 +1,4 @@
-work_dir = "examples/libgcrypt/modes"
+work_dir = "examples/libgcrypt/modes-cbc"
 name = "modes-cbc"
 target_syms = ["sym._gcry_cipher_cbc_encrypt", "sym._gcry_cipher_cbc_decrypt"]
 exec_command = "/usr/bin/timeout"

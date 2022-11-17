@@ -10,5 +10,7 @@ syms = [
         "sym.mbedtls_aes_crypt_cbc",
         "sym.aes_crypt_ctr_wrap",
         "sym.mbedtls_aes_crypt_ctr",
+        "sym.mbedtls_aes_setkey_enc",
+        "sym.mbedtls_aes_setkey_dec",
     ] },
 ]

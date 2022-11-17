@@ -1,0 +1,18 @@
+path = "../cryptolibs/dist/libressl/lib/libcrypto.so.50"
+link_name = "libcrypto.so.50"
+syms = [
+    { Matches = [
+        "sym.CRYPTO_ctr128_encrypt",
+        "sym.CRYPTO_cbc128_encrypt",
+        "sym.CRYPTO_cbc128_decrypt",
+        "sym.AES_cbc_encrypt",
+        "sym.AES_encrypt",
+        "sym.AES_set_decrypt_key",
+        "sym.AES_set_encrypt_key",
+        "sym.bnrand",
+        "sym.aes_v8_ctr32_encrypt_blocks",
+        "sym.aes_v8_cbc_encrypt",
+        "sym.vpaes_cbc_encrypt",
+        "sym.vpaes_cbc_decrypt",
+    ] },
+]

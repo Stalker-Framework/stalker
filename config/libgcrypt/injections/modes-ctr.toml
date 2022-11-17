@@ -1,4 +1,4 @@
-work_dir = "examples/libgcrypt/modes"
+work_dir = "examples/libgcrypt/modes-ctr"
 name = "modes-ctr"
 target_syms = [
     "sym._gcry_cipher_ctr_encrypt",

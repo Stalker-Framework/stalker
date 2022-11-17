@@ -77,9 +77,9 @@ impl Effect for DeterministicCipherEffect {
             }
 
             // Get the raw data from the hex strings
-            let pt = from_hex(&res[i][0]).unwrap();
-            let ct = from_hex(&res[i][1]).unwrap();
-            let rt = from_hex(&res[i][2]).unwrap();
+            let pt = from_hex(&res[i][0]).unwrap_or(vec![0; 16]);
+            let ct = from_hex(&res[i][1]).unwrap_or(vec![0; 16]);
+            let rt = from_hex(&res[i][2]).unwrap_or(vec![0; 16]);
 
             // log the byte conuts; we only consider first 16 bytes
             byte_cnt_flag = true;

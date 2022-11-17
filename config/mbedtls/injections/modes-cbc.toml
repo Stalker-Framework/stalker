@@ -1,4 +1,4 @@
-work_dir = "examples/mbedtls/modes"
+work_dir = "examples/mbedtls/modes-cbc"
 name = "modes-cbc"
 target_syms = [
     "sym.aes_crypt_cbc_wrap",

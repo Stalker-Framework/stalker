@@ -1,0 +1,8 @@
+work_dir = "examples/libgcrypt/modes-ctr"
+name = "modes-ctr-armv8"
+target_syms = [
+    "sym._gcry_aes_ctr_enc_armv8_ce",
+]
+exec_command = "/usr/bin/timeout"
+exec_args = ["30", "./bin"]
+dry_run = false

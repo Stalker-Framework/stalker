@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+while getopts ":p:a:r:e:l:" opt; do
+  case $opt in
+    p) platform="$OPTARG"
+    ;;
+    a) arch="$OPTARG"
+    ;;
+    r) run="$OPTARG"
+    ;;
+    e) exp="$OPTARG"
+    ;;
+    l) libs="$OPTARG"
+    ;;
+    \?) echo "Invalid option -$OPTARG" >&2
+    ;;
+  esac
+done
+
+# Disable AESNI(bit#57), SSSE3(bit#43) and PCLMULQDQ instruction (bit#33)
+export OPENSSL_ia32cap="~0x200020200000000"
+export LD_LIBRARY_PATH=../../lib
+
+function run_variant {
+  for lib in $libs; do set_so $lib $1; done
+  timeout -v 60 $run $1 > output/$1.txt 2>&1
+  for lib in $libs; do unset_so $lib $1; done
+}
+
+function mkdirs {
+  mkdir -p output
+}
+
+mkdirs
+run_variant $exp
+
+unset LD_LIBRARY_PATH
+unset OPENSSL_ia32cap
