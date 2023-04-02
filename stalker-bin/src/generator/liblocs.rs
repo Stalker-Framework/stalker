@@ -10,7 +10,7 @@ pub fn gen(ctx: &mut Context) -> Result<()> {
         .db
         .as_ref()
         .expect("Context Db should be initialized first.");
-    let locs_tree = db.instruction.open_tree(&"locs")?;
+    let locs_tree = db.instruction.open_tree("locs")?;
     info!("Openning db.");
     for (i, loc) in locs.iter().enumerate() {
         info!("{:2}/{:2} {}", i, cnt, &loc.name);

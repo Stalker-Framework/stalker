@@ -31,7 +31,7 @@ impl Injection {
         if let Some(db) = &ctx.db {
             let loc_name = loc_name.to_string();
             let mutant = db.mutant.clone();
-            let locs = db.instruction.open_tree(&loc_name).unwrap();
+            let locs = db.instruction.open_tree(loc_name).unwrap();
             let locs_iter = locs.iter();
             let asm = None;
             Injection {
@@ -48,9 +48,9 @@ impl Injection {
 
     fn increment(&mut self, asm: Option<Asm>, loc_asm: LocAsm) -> Option<Change> {
         let asm: Asm = asm.unwrap_or_else(|| loc_asm.clone().into());
-        let key = asm.key(&self.arch, self.index as u8);
+        let key = asm.key(&self.arch, self.index);
         self.index += 1;
-        if let Ok(Some(value)) = self.mutant.get(&key) {
+        if let Ok(Some(value)) = self.mutant.get(key) {
             let chg_asm = Asm::from(&value);
             Some(Change(loc_asm, chg_asm, self.index))
         } else {

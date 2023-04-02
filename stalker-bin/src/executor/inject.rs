@@ -10,12 +10,10 @@ pub fn exec(
     inj_config: &InjectionConfig,
     parallel: bool,
 ) -> Result<()> {
-    let injections = inj_config.target_syms.iter().map(|i| ctx.inject(&i));
+    let injections = inj_config.target_syms.iter().map(|i| ctx.inject(i));
     let iter = injections.flatten();
     let closure = |i: Change| {
-        i.perform(ctx, lib_config, &inj_config)
-            .expect("Not normal.");
-        ()
+        i.perform(ctx, lib_config, inj_config).expect("Not normal.");
     };
     if parallel {
         warn!("Using rayon parallel iterator");

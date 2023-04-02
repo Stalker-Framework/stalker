@@ -69,19 +69,19 @@ impl Change {
             match res {
                 Ok(res) => {
                     if !res.stdout.is_empty() {
-                        let mut of = File::create(&stdout_f)?;
+                        let mut of = File::create(stdout_f)?;
                         of.write_all(&res.stdout)?;
                         of.sync_all()?;
                     }
                     if !res.stderr.is_empty() {
-                        let mut ef = File::create(&stderr_f)?;
+                        let mut ef = File::create(stderr_f)?;
                         ef.write_all(&res.stderr)?;
                         ef.sync_all()?;
                     }
                 }
                 Err(e) => {
-                    let mut f = File::create(&fail_f)?;
-                    f.write_all(&e.to_string().as_bytes())?;
+                    let mut f = File::create(fail_f)?;
+                    f.write_all(e.to_string().as_bytes())?;
                 }
             };
 
@@ -94,7 +94,8 @@ impl Change {
 
     fn edit(&self, file: &str) -> Result<()> {
         let mut f = File::options().write(true).read(true).open(file)?;
-        let mut bytes = [0u8; 4];
+        let size = self.0.size as usize;
+        let mut bytes = vec![0u8; size];
         f.read_at(&mut bytes, self.0.offset as u64)?;
         debug!(
             "Change from 0x{} to 0x{} at {}",
@@ -103,7 +104,8 @@ impl Change {
             self.0.offset
         );
         f.seek(SeekFrom::Start(self.0.offset as u64))?;
-        f.write(&self.1.bytes)?;
+        let written = f.write(&self.1.bytes)?;
+        assert_eq!(written, size);
         Ok(())
     }
 }

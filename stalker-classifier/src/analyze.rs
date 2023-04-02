@@ -1,4 +1,5 @@
 use crate::effect::*;
+use log::info;
 use serde::Deserialize;
 use serde_yaml;
 use std::collections::BTreeMap;
@@ -7,7 +8,6 @@ use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::path::Path;
 use strum::{EnumProperty, VariantNames};
-use log::info;
 
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct AnalyzeConfig {

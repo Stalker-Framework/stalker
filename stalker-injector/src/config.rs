@@ -31,12 +31,8 @@ impl Default for InjectionConfig {
 }
 
 impl InjectionConfig {
-    pub fn init(&self, ctx: &Context, lib_config: &LibConfig) -> Result<()> {
-        let dir = format!(
-            "data/stalker/output/{}/{}/",
-            ctx.id(),
-            &self.name,
-        );
+    pub fn init(&self, ctx: &Context, _lib_config: &LibConfig) -> Result<()> {
+        let dir = format!("data/stalker/output/{}/{}/", ctx.id(), &self.name,);
         create_dir_all(dir)?;
         Ok(())
     }

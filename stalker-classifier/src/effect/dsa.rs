@@ -75,7 +75,7 @@ impl Effect for ProbabilisticSignatureEffect {
         if nonce_reuse != 0 {
             NonceReuse(nonce_reuse as f64 / cnt as f64)
         } else if freq_max <= 0.2 {
-            OddBytes(freq_max as f64 / cnt as f64)
+            OddBytes(freq_max / cnt as f64)
         } else if functional == cnt {
             Functional
         } else if functional != 0 {

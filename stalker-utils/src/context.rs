@@ -32,7 +32,7 @@ impl Context {
                 config.rz_path,
                 Self::identity(lib_path, &config)
             );
-            if Path::exists(&Path::new(&rzdb)) {
+            if Path::exists(Path::new(&rzdb)) {
                 info!("Found rizin db, loading...");
                 Self::new_from_saved_rzdb(rz, &rzdb, config)
             } else {

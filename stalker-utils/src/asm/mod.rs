@@ -19,7 +19,7 @@ pub struct Asm {
 impl From<String> for Asm {
     fn from(src: String) -> Self {
         let splited = src.split('_').collect::<Vec<&str>>();
-        let bytes = Vec::from_hex(&splited[0]).unwrap();
+        let bytes = Vec::from_hex(splited[0]).unwrap();
         let size = bytes.len() as u8;
         let disasm = if splited[1] == "invalid" {
             None

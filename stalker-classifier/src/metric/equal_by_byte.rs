@@ -30,7 +30,6 @@ impl Metric for EqualByByte {
                     .unwrap()
                     / secret_len as f64
             })
-            .into_iter()
             .reduce(f64::max)
         {
             r
