@@ -50,7 +50,6 @@ impl Arch {
             size: value.len() as u8,
             bytes: value,
             disasm: Some(disasm),
-            mutants: None,
         })
     }
 
@@ -76,7 +75,6 @@ impl Arch {
             size: value.len() as u8,
             bytes: value.to_vec(),
             disasm: _disasm,
-            mutants: None,
         })
     }
 }

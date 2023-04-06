@@ -6,14 +6,13 @@ use hex::FromHex;
 pub use parser::AsmParser;
 use sled::IVec;
 
-use crate::config::Arch;
+use crate::{config::Arch, context::Context};
 
 #[derive(Debug, Clone)]
 pub struct Asm {
     pub bytes: Vec<u8>,
     pub size: u8,
     pub disasm: Option<String>,
-    pub mutants: Option<Vec<Asm>>,
 }
 
 impl From<String> for Asm {
@@ -26,12 +25,10 @@ impl From<String> for Asm {
         } else {
             Some(splited[1].to_string())
         };
-        let mutants = None;
         Asm {
             bytes,
             size,
             disasm,
-            mutants,
         }
     }
 }
@@ -39,6 +36,12 @@ impl From<String> for Asm {
 impl From<&IVec> for Asm {
     fn from(v: &IVec) -> Self {
         Asm::from(String::from_utf8_lossy(v).to_string())
+    }
+}
+
+impl From<(&Context, &[u8])> for Asm {
+    fn from(v: (&Context, &[u8])) -> Self {
+        v.0.config.arch.disasm(v.1).unwrap()
     }
 }
 

@@ -42,7 +42,6 @@ impl From<LocAsm> for Asm {
             bytes: asm.bytes,
             disasm: asm.disasm,
             size: asm.size,
-            mutants: None,
         }
     }
 }
@@ -53,7 +52,6 @@ impl From<&LocAsm> for Asm {
             bytes: asm.bytes.clone(),
             disasm: asm.disasm.clone(),
             size: asm.size,
-            mutants: None,
         }
     }
 }

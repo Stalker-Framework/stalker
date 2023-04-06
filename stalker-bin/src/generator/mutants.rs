@@ -1,5 +1,6 @@
 use anyhow::Result;
 use log::{debug, info};
+use stalker_mutator::model::Bitflip;
 use stalker_mutator::Mutatable;
 use stalker_utils::asm::Asm;
 use stalker_utils::config::LibConfig;
@@ -24,7 +25,7 @@ pub fn gen(ctx: &mut Context, lib_config: &LibConfig) -> Result<()> {
                     continue;
                 } else {
                     for (i, mutant) in asm
-                        .mutants(|bytes| ctx.config.arch.disasm(bytes))
+                        .mutants::<Bitflip>(|bytes| ctx.config.arch.disasm(&bytes))
                         .enumerate()
                     {
                         let m = mutant.unwrap();
