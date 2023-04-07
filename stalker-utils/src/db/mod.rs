@@ -1,10 +1,10 @@
 use crate::context::Context;
+use crate::tag::Tag;
 use crate::Result;
 use std::fs::create_dir_all;
 
 pub struct Db {
     pub mutant: sled::Tree,
-    pub injection: sled::Db,
     pub instruction: sled::Db,
 }
 
@@ -15,7 +15,6 @@ impl Db {
         create_dir_all(format!("{}/target/{}", db_path, identity))?;
         let mutant_db = sled::open(format!("{}/mutant", db_path))?;
         let db = Db {
-            injection: sled::open(format!("{}/target/{}/injection", db_path, identity))?,
             instruction: sled::open(format!("{}/target/{}/instruction", db_path, identity))?,
             mutant: mutant_db.open_tree("mutant")?,
         };

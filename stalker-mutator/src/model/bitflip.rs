@@ -1,3 +1,5 @@
+use stalker_utils::tag::Tag;
+
 pub use crate::traits::*;
 
 pub struct Bitflip;
@@ -19,6 +21,16 @@ impl FaultModel for Bitflip {
     }
 }
 
+impl Tag for Bitflip {
+    fn tag() -> String {
+        "bitflip".into()
+    }
+
+    fn id(&self) -> String {
+        Self::tag()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -27,7 +39,7 @@ mod tests {
     use stalker_utils::context::PreContext;
 
     #[test]
-    fn test_raw_mutants() -> Result<()> {
+    fn test_bitflip_raw_mutants() -> Result<()> {
         let bytes = vec![0u8, 1u8, 2u8, 3u8];
         let mut len = 0;
         for _ in bytes.raw_mutants::<Bitflip>() {
@@ -38,7 +50,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mutants() -> Result<()> {
+    fn test_bitflip_mutants() -> Result<()> {
         let mut ctx = PreContext::default().data_path("/tmp/stalker").init()?;
         ctx.lib.init_locs(&mut ctx.rz)?;
         let mut snames = vec![];

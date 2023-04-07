@@ -9,6 +9,7 @@ use serfig::collectors::{from_file, from_self};
 use serfig::parsers::Toml;
 use serfig::Builder;
 use stalker_injector::InjectionConfig;
+use stalker_mutator::model::Bitflip;
 use stalker_utils::config::{Config, LibConfig};
 use stalker_utils::context::Context;
 
@@ -86,13 +87,15 @@ fn main() -> anyhow::Result<()> {
     ctx.lib.init_locs(&mut ctx.rz)?;
     ctx.init_db()?;
 
+    type Model = Bitflip;
+
     match &cli.command {
         Some(Commands::Init) => (),
         Some(Commands::GenLocs) => {
             generator::liblocs::gen(&mut ctx)?;
         }
         Some(Commands::GenMuts) => {
-            generator::mutants::gen(&mut ctx, &lib_config)?;
+            generator::mutants::gen::<Model>(&mut ctx, &lib_config)?;
         }
         Some(Commands::Inject) => {
             inj_config.init(&ctx, &lib_config)?;

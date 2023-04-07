@@ -6,6 +6,7 @@ mod db;
 mod error;
 pub mod fmt;
 pub mod loc;
+pub mod tag;
 
 pub type Result<T, E = error::Error> = core::result::Result<T, E>;
 

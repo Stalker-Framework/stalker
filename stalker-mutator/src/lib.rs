@@ -1,7 +1,7 @@
 pub mod model;
 mod traits;
 
-pub use traits::{Mutatable, RawMutatable};
+pub use traits::{FaultModel, Mutatable, RawMutatable};
 
 #[cfg(test)]
 mod tests {

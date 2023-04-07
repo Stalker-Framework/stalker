@@ -4,6 +4,7 @@ use log::{debug, info, warn};
 use stalker_utils::config::LibConfig;
 use stalker_utils::context::Context;
 use stalker_utils::fmt::hex;
+use stalker_utils::tag::Tag;
 use std::fs::{copy, create_dir, remove_dir, remove_file, File};
 use std::io::{Seek, SeekFrom, Write};
 use std::os::unix::prelude::FileExt;

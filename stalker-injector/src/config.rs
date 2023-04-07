@@ -2,7 +2,7 @@ use std::fs::create_dir_all;
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-use stalker_utils::{config::LibConfig, context::Context};
+use stalker_utils::{config::LibConfig, context::Context, tag::Tag};
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(default)]

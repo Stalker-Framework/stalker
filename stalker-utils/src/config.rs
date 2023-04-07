@@ -1,4 +1,5 @@
 use crate::binary::BinaryInfo;
+use crate::tag::Tag;
 
 use super::asm::Asm;
 use super::fmt;
@@ -6,6 +7,7 @@ use super::Result;
 use hex::FromHex;
 use rzpipe::RzPipe;
 use serde::{Deserialize, Serialize};
+use std::path::Path;
 use std::process::Command;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -42,6 +44,18 @@ impl Default for Config {
             rz_path: "data/stalker/rizin".into(),
             binary_info: BinaryInfo::default(),
         }
+    }
+}
+
+impl Tag for Config {
+    fn id(&self) -> String {
+        let file = Path::new(&self.binary_info.core.file);
+        let filename = file.file_name().unwrap().to_str().unwrap();
+        format!("{}-{}-{}", &self.arch, &self.os, &filename)
+    }
+
+    fn tag() -> String {
+        "config".into()
     }
 }
 

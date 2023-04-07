@@ -1,13 +1,12 @@
 use anyhow::Result;
 use log::{debug, info};
-use stalker_mutator::model::Bitflip;
-use stalker_mutator::Mutatable;
+use stalker_mutator::{Mutatable, FaultModel};
 use stalker_utils::asm::Asm;
 use stalker_utils::config::LibConfig;
 use stalker_utils::context::Context;
 use stalker_utils::fmt::hex;
 
-pub fn gen(ctx: &mut Context, lib_config: &LibConfig) -> Result<()> {
+pub fn gen<M: FaultModel>(ctx: &mut Context, lib_config: &LibConfig) -> Result<()> {
     let locs = ctx.lib.locs.to_vec();
     let db = ctx
         .db
@@ -25,7 +24,7 @@ pub fn gen(ctx: &mut Context, lib_config: &LibConfig) -> Result<()> {
                     continue;
                 } else {
                     for (i, mutant) in asm
-                        .mutants::<Bitflip>(|bytes| ctx.config.arch.disasm(&bytes))
+                        .mutants::<M>(|bytes| ctx.config.arch.disasm(&bytes))
                         .enumerate()
                     {
                         let m = mutant.unwrap();

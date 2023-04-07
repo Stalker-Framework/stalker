@@ -1,9 +1,9 @@
-use stalker_utils::asm::Asm;
+use stalker_utils::{asm::Asm, tag::Tag};
 use std::{iter::Map, marker::PhantomData};
 
 pub trait FaultModel
 where
-    Self: Sized,
+    Self: Sized + Tag,
 {
     fn next_mutant(iter: &mut IntoIter<Self>) -> Option<Vec<u8>>;
 }

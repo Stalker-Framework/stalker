@@ -1,3 +1,5 @@
+use crate::tag::Tag;
+
 use super::config::Config;
 use super::db::Db;
 use super::loc::LibInstance;
@@ -42,7 +44,7 @@ impl PreContext {
         let mut rz = RzPipe::spawn(&self.lib_path, None)?;
         if let Some(config) = self.config {
             let config = config.update(&mut rz)?;
-            let rzdb = format!("{}/{}.rzdb", config.rz_path, Context::identity(&config));
+            let rzdb = format!("{}/{}.rzdb", config.rz_path, config.id());
             if Path::exists(Path::new(&rzdb)) {
                 info!("Found rizin db, loading...");
                 Context::init_from_saved_rzdb(rz, &rzdb, config)
@@ -118,7 +120,7 @@ impl Context {
     fn init_from_scratch(mut rz: RzPipe) -> Result<Context> {
         let config = Self::init_config(&mut rz)?;
         create_dir_all(&config.rz_path)?;
-        let rzdb = format!("{}/{}.rzdb", config.rz_path, Context::identity(&config));
+        let rzdb = format!("{}/{}.rzdb", config.rz_path, config.id());
         rz.cmd(&format!("Ps {}", rzdb))?;
         info!("Saved rizin db at {}", rzdb);
         Ok(Context {
@@ -147,14 +149,14 @@ impl Context {
         }
         Ok(())
     }
+}
 
-    pub fn identity(config: &Config) -> String {
-        let file = Path::new(&config.binary_info.core.file);
-        let filename = file.file_name().unwrap().to_str().unwrap();
-        format!("{}-{}-{}", &config.arch, &config.os, &filename)
+impl Tag for Context {
+    fn id(&self) -> String {
+        self.config.id()
     }
 
-    pub fn id(&self) -> String {
-        Self::identity(&self.config)
+    fn tag() -> String {
+        "context".into()
     }
 }

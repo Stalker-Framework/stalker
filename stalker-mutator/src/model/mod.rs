@@ -4,4 +4,5 @@ mod stuck;
 
 pub use {
     bitflip::Bitflip,
+    stuck::Stuck
 };
