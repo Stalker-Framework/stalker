@@ -1,7 +1,10 @@
+use crate::binary::BinaryInfo;
+
 use super::asm::Asm;
 use super::fmt;
 use super::Result;
 use hex::FromHex;
+use rzpipe::RzPipe;
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
@@ -27,6 +30,7 @@ pub struct Config {
     pub os: String,
     pub db_path: String,
     pub rz_path: String,
+    pub binary_info: BinaryInfo,
 }
 
 impl Default for Config {
@@ -36,7 +40,24 @@ impl Default for Config {
             os: "linux".into(),
             db_path: "data/stalker".into(),
             rz_path: "data/stalker/rizin".into(),
+            binary_info: BinaryInfo::default(),
         }
+    }
+}
+
+impl Config {
+    pub fn update(self, rz: &mut RzPipe) -> Result<Config> {
+        rz.cmd("aa")?;
+        let binary_info_s = rz.cmd("ij")?;
+        let binary_info: BinaryInfo = serde_json::from_str(&binary_info_s)?;
+        Ok(Config {
+            arch: crate::config::Arch {
+                arch: binary_info.bin.arch.clone(),
+                bits: binary_info.bin.bits,
+            },
+            binary_info,
+            ..self
+        })
     }
 }
 

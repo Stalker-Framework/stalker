@@ -46,7 +46,7 @@ impl Change {
                 return Ok(());
             }
             // Binary files
-            let origin = Path::new(&ctx.binary_info.core.file);
+            let origin = Path::new(&ctx.config.binary_info.core.file);
             let load = format!("/tmp/{}", &self.id());
             let new = format!("{}/{}", &load, &lib_config.link_name);
 

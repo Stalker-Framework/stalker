@@ -15,7 +15,9 @@ mod tests {
 
     #[test]
     fn test_loc() -> anyhow::Result<()> {
-        let ctx = context::Context::default();
+        let ctx = context::PreContext::default()
+            .data_path("/tmp/stalker")
+            .init()?;
         let mut lib = ctx.lib;
         let mut rz = ctx.rz;
         lib.init_locs(&mut rz)?;

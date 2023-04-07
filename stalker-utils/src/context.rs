@@ -1,4 +1,3 @@
-use super::binary::BinaryInfo;
 use super::config::Config;
 use super::db::Db;
 use super::loc::LibInstance;
@@ -11,94 +10,130 @@ use std::path::Path;
 
 pub struct Context {
     pub config: Config,
-    pub binary_info: BinaryInfo,
     pub rz: Box<RzPipe>,
     pub db: Option<Db>,
     pub lib: LibInstance,
 }
 
+pub struct PreContext {
+    pub lib_path: String,
+    pub config: Option<Config>,
+    pub rz: Option<Box<RzPipe>>,
+}
+
 impl Default for Context {
     fn default() -> Self {
-        Context::new("/bin/ls", Some(Config::default())).unwrap()
+        Context::pre("/bin/ls").init().unwrap()
+    }
+}
+
+impl Default for PreContext {
+    fn default() -> Self {
+        Self {
+            lib_path: "/bin/ls".to_string(),
+            config: None,
+            rz: None,
+        }
+    }
+}
+
+impl PreContext {
+    pub fn init(self) -> Result<Context> {
+        let mut rz = RzPipe::spawn(&self.lib_path, None)?;
+        if let Some(config) = self.config {
+            let config = config.update(&mut rz)?;
+            let rzdb = format!("{}/{}.rzdb", config.rz_path, Context::identity(&config));
+            if Path::exists(Path::new(&rzdb)) {
+                info!("Found rizin db, loading...");
+                Context::init_from_saved_rzdb(rz, &rzdb, config)
+            } else {
+                warn!("Rizin db not found, creating...");
+                create_dir_all(&config.rz_path)?;
+                Context::init_from_scratch_with_config(rz, &rzdb, config)
+            }
+        } else {
+            warn!("Config not present, initializing...");
+            Context::init_from_scratch(rz)
+        }
+    }
+
+    pub fn with_lib(self, lib_path: &str) -> Self {
+        Self {
+            lib_path: lib_path.to_string(),
+            ..self
+        }
+    }
+
+    pub fn with_config(self, config: Config) -> Self {
+        Self {
+            config: Some(config),
+            ..self
+        }
+    }
+
+    pub fn data_path(self, data_path: &str) -> Self {
+        Self {
+            config: Some(Config {
+                rz_path: data_path.to_string() + "/rizin",
+                db_path: data_path.to_string(),
+                ..self.config.unwrap_or_default()
+            }),
+            ..self
+        }
     }
 }
 
 impl Context {
-    pub fn new(lib_path: &str, optional_config: Option<Config>) -> Result<Context> {
-        let rz = RzPipe::spawn(lib_path, None)?;
-        if let Some(config) = optional_config {
-            let rzdb = format!(
-                "{}/{}.rzdb",
-                config.rz_path,
-                Self::identity(lib_path, &config)
-            );
-            if Path::exists(Path::new(&rzdb)) {
-                info!("Found rizin db, loading...");
-                Self::new_from_saved_rzdb(rz, &rzdb, config)
-            } else {
-                warn!("Rizin db not found, creating...");
-                create_dir_all(&config.rz_path)?;
-                Self::new_from_scratch_with_config(rz, &rzdb, lib_path, config)
-            }
-        } else {
-            warn!("Config not present, initializing...");
-            Self::new_from_scratch(rz, lib_path)
+    pub fn pre(lib_path: &str) -> PreContext {
+        PreContext {
+            config: None,
+            lib_path: lib_path.to_string(),
+            ..Default::default()
         }
     }
 
-    fn new_from_scratch_with_config(
+    pub fn new(lib_path: &str) -> Result<Context> {
+        Context::pre(lib_path).init()
+    }
+
+    fn init_from_scratch_with_config(
         mut rz: RzPipe,
         rzdb: &str,
-        lib_path: &str,
         config: Config,
     ) -> Result<Context> {
-        rz.cmd(&format!("o {}", lib_path))?;
-        rz.cmd("aa")?;
-        let binary_info_s = rz.cmd("ij")?;
-        let binary_info: BinaryInfo = serde_json::from_str(&binary_info_s)?;
         rz.cmd(&format!("Ps {}", rzdb))?;
         info!("Saved rizin db at {}", rzdb);
         Ok(Context {
             config,
             rz: Box::new(rz),
-            binary_info,
             db: None,
             lib: LibInstance::default(),
         })
     }
 
-    fn new_from_scratch(mut rz: RzPipe, lib_path: &str) -> Result<Context> {
-        rz.cmd("aa")?;
-        let mut config = Config::default();
-        let binary_info_s = rz.cmd("ij")?;
-        let binary_info: BinaryInfo = serde_json::from_str(&binary_info_s)?;
-        config.arch.arch = binary_info.bin.arch.clone();
-        config.arch.bits = binary_info.bin.bits;
+    fn init_config(rz: &mut RzPipe) -> Result<Config> {
+        Config::default().update(rz)
+    }
+
+    fn init_from_scratch(mut rz: RzPipe) -> Result<Context> {
+        let config = Self::init_config(&mut rz)?;
         create_dir_all(&config.rz_path)?;
-        let rzdb = format!(
-            "{}/{}.rzdb",
-            config.rz_path,
-            Context::identity(lib_path, &config)
-        );
+        let rzdb = format!("{}/{}.rzdb", config.rz_path, Context::identity(&config));
         rz.cmd(&format!("Ps {}", rzdb))?;
         info!("Saved rizin db at {}", rzdb);
         Ok(Context {
             config,
             rz: Box::new(rz),
-            binary_info,
             db: None,
             lib: LibInstance::default(),
         })
     }
 
-    fn new_from_saved_rzdb(mut rz: RzPipe, rzdb: &str, config: Config) -> Result<Context> {
+    fn init_from_saved_rzdb(mut rz: RzPipe, rzdb: &str, config: Config) -> Result<Context> {
         rz.cmd(&format!("Po {}", rzdb))?;
-        let binary_info_s = rz.cmd("ij")?;
-        let binary_info: BinaryInfo = serde_json::from_str(&binary_info_s)?;
         let ctx = Context {
-            config,
+            config: config.update(&mut rz)?,
             rz: Box::new(rz),
-            binary_info,
             db: None,
             lib: LibInstance::default(),
         };
@@ -113,13 +148,13 @@ impl Context {
         Ok(())
     }
 
-    pub fn identity(path: &str, config: &Config) -> String {
-        let file = Path::new(path);
+    pub fn identity(config: &Config) -> String {
+        let file = Path::new(&config.binary_info.core.file);
         let filename = file.file_name().unwrap().to_str().unwrap();
         format!("{}-{}-{}", &config.arch, &config.os, &filename)
     }
 
     pub fn id(&self) -> String {
-        Self::identity(&self.binary_info.core.file, &self.config)
+        Self::identity(&self.config)
     }
 }
