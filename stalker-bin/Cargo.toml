@@ -1,20 +1,20 @@
 [package]
 name = "stalker-bin"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-"serfig" = "0.0.3"
-"serde" = "1.0.137"
-"serde_json" = "1.0.81"
-"anyhow" = "1.0.57"
+"serfig" = "0.1.0"
+"serde" = "1.0.159"
+"serde_json" = "1.0.95"
+"anyhow" = "1.0.70"
 stalker-utils = { path= "../stalker-utils" }
 stalker-mutator = { path= "../stalker-mutator" }
 stalker-injector = { path= "../stalker-injector" }
 log = "0.4.17"
-env_logger = "0.9.1"
-clap = { version = "4.0.18", features = ["derive"] }
-rayon = "1.5.3"
-indicatif = "0.17.1"
+env_logger = "0.10.0"
+clap = { version = "4.2.1", features = ["derive"] }
+rayon = "1.7.0"
+indicatif = "0.17.3"
