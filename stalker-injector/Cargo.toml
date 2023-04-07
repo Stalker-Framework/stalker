@@ -1,6 +1,6 @@
 [package]
 name = "stalker-injector"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -8,9 +8,9 @@ edition = "2021"
 [dependencies]
 stalker-utils = { path= "../stalker-utils" }
 stalker-mutator = { path= "../stalker-mutator" }
-anyhow = "1.0.57"
+anyhow = "1.0.70"
 sled = "0.34.7"
 log = "0.4.17"
-"serde" = "1.0.137"
-"serde_json" = "1.0.81"
-"serde_with" = { version = "1.14.0", features = ["hex"] }
+"serde" = "1.0.159"
+"serde_json" = "1.0.95"
+"serde_with" = { version = "2.3.2", features = ["hex"] }

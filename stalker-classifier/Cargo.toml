@@ -1,17 +1,17 @@
 [package]
 name = "stalker-classifier"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-hex = "*"
-strum = "0.23"
-strum_macros = "0.23"
-lazy_static = "*"
-derive_more = "*"
-serde = { version = "*", features = ["derive"] }
-serde_yaml = "*"
-anyhow = "*"
+hex = "0.4.3"
+strum = "0.24.1"
+strum_macros = "0.24.3"
+lazy_static = "1.4.0"
+derive_more = "0.99.17"
+serde = { version = "1.0.159", features = ["derive"] }
+serde_yaml = "0.9.21"
+anyhow = "1.0.70"
 log = "0.4.17"
