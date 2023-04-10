@@ -17,7 +17,7 @@ pub struct Context {
     pub lib: LibInstance,
 }
 
-pub struct PreContext {
+pub struct ContextBuilder {
     pub lib_path: String,
     pub config: Option<Config>,
     pub rz: Option<Box<RzPipe>>,
@@ -25,11 +25,11 @@ pub struct PreContext {
 
 impl Default for Context {
     fn default() -> Self {
-        Context::pre("/bin/ls").init().unwrap()
+        Context::builder("/bin/ls").build().unwrap()
     }
 }
 
-impl Default for PreContext {
+impl Default for ContextBuilder {
     fn default() -> Self {
         Self {
             lib_path: "/bin/ls".to_string(),
@@ -39,8 +39,8 @@ impl Default for PreContext {
     }
 }
 
-impl PreContext {
-    pub fn init(self) -> Result<Context> {
+impl ContextBuilder {
+    pub fn build(self) -> Result<Context> {
         let mut rz = RzPipe::spawn(&self.lib_path, None)?;
         if let Some(config) = self.config {
             let config = config.update(&mut rz)?;
@@ -59,35 +59,29 @@ impl PreContext {
         }
     }
 
-    pub fn with_lib(self, lib_path: &str) -> Self {
-        Self {
-            lib_path: lib_path.to_string(),
-            ..self
-        }
+    pub fn lib_path(mut self, lib_path: &str) -> Self {
+        self.lib_path = lib_path.to_string();
+        self
     }
 
-    pub fn with_config(self, config: Config) -> Self {
-        Self {
-            config: Some(config),
-            ..self
-        }
+    pub fn config(mut self, config: Config) -> Self {
+        self.config = Some(config);
+        self
     }
 
-    pub fn data_path(self, data_path: &str) -> Self {
-        Self {
-            config: Some(Config {
-                rz_path: data_path.to_string() + "/rizin",
-                db_path: data_path.to_string(),
-                ..self.config.unwrap_or_default()
-            }),
-            ..self
-        }
+    pub fn data_path(mut self, data_path: &str) -> Self {
+        self.config = Some(Config {
+            rz_path: data_path.to_string() + "/rizin",
+            db_path: data_path.to_string(),
+            ..self.config.unwrap_or_default()
+        });
+        self
     }
 }
 
 impl Context {
-    pub fn pre(lib_path: &str) -> PreContext {
-        PreContext {
+    pub fn builder(lib_path: &str) -> ContextBuilder {
+        ContextBuilder {
             config: None,
             lib_path: lib_path.to_string(),
             ..Default::default()
@@ -95,7 +89,7 @@ impl Context {
     }
 
     pub fn new(lib_path: &str) -> Result<Context> {
-        Context::pre(lib_path).init()
+        Context::builder(lib_path).build()
     }
 
     fn init_from_scratch_with_config(

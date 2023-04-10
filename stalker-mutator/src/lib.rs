@@ -9,12 +9,12 @@ mod tests {
     use anyhow::Result;
     use model::Bitflip;
     use stalker_utils::asm::Asm;
-    use stalker_utils::context::PreContext;
+    use stalker_utils::context::ContextBuilder;
     use stalker_utils::fmt::hex;
 
     #[test]
     fn test_db() -> Result<()> {
-        let mut ctx = PreContext::default().data_path("/tmp/stalker").init()?;
+        let mut ctx = ContextBuilder::default().data_path("/tmp/stalker").build()?;
         println!("{:?}", ctx.config);
         ctx.lib.init_locs(&mut ctx.rz)?;
         ctx.init_db()?;

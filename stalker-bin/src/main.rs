@@ -83,7 +83,7 @@ fn main() -> anyhow::Result<()> {
     info!("Target lib: {}", &lib_config.path);
 
     // Initialization
-    let mut ctx = Context::pre(&lib_config.path).with_config(config).init()?;
+    let mut ctx = Context::builder(&lib_config.path).config(config).build()?;
     ctx.lib.init_locs(&mut ctx.rz)?;
     ctx.init_db()?;
 

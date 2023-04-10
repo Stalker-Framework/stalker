@@ -36,7 +36,7 @@ mod tests {
     use super::*;
     use anyhow::Result;
     use stalker_utils::asm::Asm;
-    use stalker_utils::context::PreContext;
+    use stalker_utils::context::ContextBuilder;
 
     #[test]
     fn test_bitflip_raw_mutants() -> Result<()> {
@@ -51,7 +51,7 @@ mod tests {
 
     #[test]
     fn test_bitflip_mutants() -> Result<()> {
-        let mut ctx = PreContext::default().data_path("/tmp/stalker").init()?;
+        let mut ctx = ContextBuilder::default().data_path("/tmp/stalker").build()?;
         ctx.lib.init_locs(&mut ctx.rz)?;
         let mut snames = vec![];
         for _ in 0..ctx.lib.locs.len() {
