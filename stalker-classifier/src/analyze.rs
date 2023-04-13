@@ -1,4 +1,5 @@
 use crate::effect::*;
+use anyhow::Result;
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
@@ -10,10 +11,10 @@ use strum::{EnumProperty, VariantNames};
 
 #[derive(Debug, Default, PartialEq, Deserialize, Serialize)]
 pub struct AnalyzeConfig {
-    path: String,
-    output: AnalyzeOutput,
-    fields: usize,
-    experiments: BTreeMap<String, Vec<String>>,
+    pub path: String,
+    pub output: AnalyzeOutput,
+    pub fields: usize,
+    pub experiments: BTreeMap<String, Vec<String>>,
     pub model: AnalyzeModel,
 }
 
@@ -38,7 +39,7 @@ impl Default for AnalyzeOutputMode {
 
 pub fn analyze<T: Display + Effect + VariantNames + AsRef<str> + EnumProperty>(
     config: &AnalyzeConfig,
-) {
+) -> Result<()> {
     let root = Path::new(&config.path);
     for exp_id in config.experiments.keys() {
         let exps_dir = root.join(exp_id);
@@ -77,9 +78,10 @@ pub fn analyze<T: Display + Effect + VariantNames + AsRef<str> + EnumProperty>(
                         .create(true)
                         .open(output_file)
                         .expect("Result file created failed.");
-                    file.write_all(res.as_bytes()).unwrap();
+                    file.write_all(res.as_bytes())?;
                 }
             }
         }
     }
+    Ok(())
 }

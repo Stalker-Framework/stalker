@@ -29,12 +29,12 @@ impl Default for AnalyzeModel {
     }
 }
 
-fn nop(_: &AnalyzeConfig) {
-    ()
+fn nop(_: &AnalyzeConfig) -> Result<()> {
+    Ok(())
 }
 
 impl AnalyzeModel {
-    pub fn analyze_fn(&self) -> impl Fn(&AnalyzeConfig) -> () {
+    pub fn analyze_fn(&self) -> impl Fn(&AnalyzeConfig) -> Result<()> {
         match self {
             Self::DeterministicCipher => analyze::<DeterministicCipherEffect>,
             Self::ProbabilisticSignature => analyze::<ProbabilisticSignatureEffect>,

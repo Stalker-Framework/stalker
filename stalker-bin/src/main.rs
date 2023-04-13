@@ -1,7 +1,7 @@
 mod executor;
 mod generator;
 
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 use env_logger::Env;
 use log::info;
 use serde::{Deserialize, Serialize};
@@ -25,30 +25,43 @@ struct Cli {
     #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/lib.toml"))]
     lib_config: String,
 
-    #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/inject.toml"))]
-    inj_config: String,
-
-    #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/experiments/dsa.yaml"))]
-    analyze_config: String,
-
     /// Turn logging on
     #[arg(short, long, action = clap::ArgAction::Count)]
     verbose: u8,
 
-    /// Turn logging on
-    #[arg(short, default_value_t = true)]
-    parallel: bool,
     #[command(subcommand)]
     command: Option<Commands>,
 }
 
-#[derive(Subcommand, PartialEq)]
+#[derive(Subcommand)]
 enum Commands {
-    Init,
     GenLocs,
     GenMuts,
-    Inject,
-    Analyze,
+    GenExps(GenExpsArgs),
+    Inject(InjectArgs),
+    Analyze(AnalyzeArgs),
+}
+
+#[derive(Args)]
+struct InjectArgs {
+    #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/inject.toml"))]
+    inj_config: String,
+
+    /// Turn parallel on
+    #[arg(short, default_value_t = true)]
+    parallel: bool,
+}
+
+#[derive(Args)]
+struct AnalyzeArgs {
+    #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/experiments/dsa.yaml"))]
+    analyze_config: String,
+}
+
+#[derive(Args)]
+struct GenExpsArgs {
+    #[arg(short, long, value_name = "PATH", default_value_t = String::from("data/stalker/output"))]
+    path: String,
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, Clone)]
@@ -73,13 +86,17 @@ fn main() -> anyhow::Result<()> {
 
     info!("Verbose level: {}", cli.verbose);
 
-    // To analyze;
-    if cli.command == Some(Commands::Analyze) {
-        let analyze_config = Builder::default()
-            .collect(from_file(Toml, &cli.analyze_config))
-            .collect(from_self(AnalyzeConfig::default()))
-            .build()?;
-        return executor::analyze::exec(&analyze_config);
+    // To analyze or generate the experiments;
+    match cli.command {
+        Some(Commands::Analyze(analyze_args)) => {
+            let analyze_config = Builder::default()
+                .collect(from_file(Toml, &analyze_args.analyze_config))
+                .collect(from_self(AnalyzeConfig::default()))
+                .build()?;
+            return executor::analyze::exec(&analyze_config);
+        }
+        Some(Commands::GenExps(genexps_args)) => return generator::exps::gen(&genexps_args.path),
+        _ => {}
     }
 
     // Build lib config.
@@ -102,20 +119,19 @@ fn main() -> anyhow::Result<()> {
     type Model = Bitflip;
 
     match &cli.command {
-        Some(Commands::Init) => (),
         Some(Commands::GenLocs) => {
             generator::liblocs::gen(&mut ctx)?;
         }
         Some(Commands::GenMuts) => {
             generator::mutants::gen::<Model>(&mut ctx, &lib_config)?;
         }
-        Some(Commands::Inject) => {
+        Some(Commands::Inject(inj_args)) => {
             let inj_builder = Builder::default()
-                .collect(from_file(Toml, &cli.inj_config))
+                .collect(from_file(Toml, &inj_args.inj_config))
                 .collect(from_self(InjectionConfig::default()));
             let inj_config: InjectionConfig = inj_builder.build()?;
             inj_config.init(&ctx, &lib_config)?;
-            executor::inject::exec(&mut ctx, &lib_config, &inj_config, cli.parallel)?;
+            executor::inject::exec(&mut ctx, &lib_config, &inj_config, inj_args.parallel)?;
         }
         _ => {}
     }
