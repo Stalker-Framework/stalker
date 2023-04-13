@@ -1,4 +1,9 @@
-use crate::parse::{Fields, ParseError};
+use crate::{
+    analyze::{analyze, AnalyzeConfig},
+    parse::{Fields, ParseError},
+};
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::convert::AsRef;
 use std::fmt::Display;
@@ -11,7 +16,35 @@ mod dsa;
 pub use dc::*;
 pub use dsa::*;
 
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+pub enum AnalyzeModel {
+    DeterministicCipher,
+    ProbabilisticSignature,
+    Nothing,
+}
+
+impl Default for AnalyzeModel {
+    fn default() -> Self {
+        Self::Nothing
+    }
+}
+
+fn nop(_: &AnalyzeConfig) {
+    ()
+}
+
+impl AnalyzeModel {
+    pub fn analyze_fn(&self) -> impl Fn(&AnalyzeConfig) -> () {
+        match self {
+            Self::DeterministicCipher => analyze::<DeterministicCipherEffect>,
+            Self::ProbabilisticSignature => analyze::<ProbabilisticSignatureEffect>,
+            Self::Nothing => nop,
+        }
+    }
+}
+
 pub trait Effect: Sized {
+    const HAS_EXPECT: bool;
     fn check(expect: &Option<Vec<Fields>>, res: &[Fields]) -> Self;
 }
 
@@ -91,14 +124,15 @@ pub fn inspect<T: Display + Effect + VariantNames + AsRef<str> + EnumProperty>(
 
 pub fn process_dir<T: Effect>(
     path: &Path,
-    expect_path: Option<&str>,
     group_size: usize,
 ) -> Vec<(String, Result<T, ParseError>)> {
-    let expect =
-        expect_path.map(|expect_p| Fields::from_file(path.join(expect_p), group_size).unwrap());
-
     let mut res_files = read_dir(path).unwrap();
     let mut res_vec: Vec<(String, Result<T, ParseError>)> = vec![];
+    let expect: Option<Vec<Fields>> = if T::HAS_EXPECT {
+        Fields::from_file(path.join("expected.txt"), group_size).ok()
+    } else {
+        None
+    };
 
     while let Some(Ok(path)) = res_files.next() {
         let p_s = path.path().clone();

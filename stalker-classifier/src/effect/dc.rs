@@ -36,6 +36,7 @@ pub enum DeterministicCipherEffect {
 }
 
 impl Effect for DeterministicCipherEffect {
+    const HAS_EXPECT: bool = true;
     fn check(expect: &Option<Vec<Fields>>, res: &[Fields]) -> DeterministicCipherEffect {
         // `DeterministicCipherEffect` requires the expected result non-empty.
         assert!(expect.is_some());

@@ -21,6 +21,7 @@ pub enum ProbabilisticSignatureEffect {
 }
 
 impl Effect for ProbabilisticSignatureEffect {
+    const HAS_EXPECT: bool = false;
     fn check(expect: &Option<Vec<Fields>>, res: &[Fields]) -> ProbabilisticSignatureEffect {
         // `ProbabilisticSignatureEffect` requires no expected results.
         assert!(expect.is_none());
