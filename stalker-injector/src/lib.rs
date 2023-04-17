@@ -1,11 +1,15 @@
 mod config;
 mod exec;
 mod fmt;
+use std::marker::PhantomData;
+
 pub use config::InjectionConfig;
 use sled::Tree;
+use stalker_mutator::FaultModel;
 use stalker_utils::{asm::Asm, config::Arch, context::Context, loc::LocAsm};
 
-pub struct Injection {
+pub struct Injection<M: FaultModel> {
+    phantom: PhantomData<M>,
     arch: Arch,
     mutant: Tree,
     loc_asm: Option<LocAsm>,
@@ -17,24 +21,25 @@ pub struct Injection {
 pub struct Change(LocAsm, Asm, u8);
 
 pub trait Injectable {
-    fn inject(&self, loc_name: &str) -> Injection;
+    fn inject<M : FaultModel>(&self, loc_name: &str) -> Injection<M>;
 }
 
 impl Injectable for Context {
-    fn inject(&self, loc_name: &str) -> Injection {
+    fn inject<M : FaultModel>(&self, loc_name: &str) -> Injection<M> {
         Injection::new(self, loc_name)
     }
 }
 
-impl Injection {
+impl<M: FaultModel> Injection<M> {
     fn new(ctx: &Context, loc_name: &str) -> Self {
         if let Some(db) = &ctx.db {
             let loc_name = loc_name.to_string();
-            let mutant = db.mutant.clone();
+            let mutant = db.mutant.open_tree(M::tag()).expect("Mutants db not found!").clone();
             let locs = db.instruction.open_tree(loc_name).unwrap();
             let locs_iter = locs.iter();
             let asm = None;
             Injection {
+                phantom: PhantomData::default(),
                 arch: ctx.config.arch.clone(),
                 mutant,
                 loc_asm: asm,
@@ -59,7 +64,7 @@ impl Injection {
     }
 }
 
-impl Iterator for Injection {
+impl<M: FaultModel> Iterator for Injection<M> {
     type Item = Change;
 
     fn next(&mut self) -> Option<Self::Item> {

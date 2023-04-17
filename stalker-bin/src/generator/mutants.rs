@@ -1,6 +1,6 @@
 use anyhow::Result;
 use log::{debug, info};
-use stalker_mutator::{Mutatable, FaultModel};
+use stalker_mutator::{FaultModel, Mutatable};
 use stalker_utils::asm::Asm;
 use stalker_utils::config::LibConfig;
 use stalker_utils::context::Context;
@@ -20,7 +20,8 @@ pub fn gen<M: FaultModel>(ctx: &mut Context, lib_config: &LibConfig) -> Result<(
             info!("Found symbol {}", &loc.name);
             for op in locinfo.ops.iter() {
                 let asm = Asm::from(op);
-                if let Ok(Some(_)) = db.mutant.get(asm.key(&ctx.config.arch, asm.size * 8 - 1)) {
+                let mutant_db = &db.mutant.open_tree(M::tag())?;
+                if let Ok(Some(_)) = mutant_db.get(asm.key(&ctx.config.arch, asm.size * 8 - 1)) {
                     continue;
                 } else {
                     for (i, mutant) in asm
@@ -38,7 +39,7 @@ pub fn gen<M: FaultModel>(ctx: &mut Context, lib_config: &LibConfig) -> Result<(
                             }
                         );
                         debug!("{} {}", &key, &val);
-                        db.mutant.insert(key, val.as_str())?;
+                        mutant_db.insert(key, val.as_str())?;
                     }
                 }
             }

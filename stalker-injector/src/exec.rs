@@ -1,11 +1,12 @@
 use crate::{Change, InjectionConfig};
 use anyhow::Result;
 use log::{debug, info, warn};
+use stalker_mutator::FaultModel;
 use stalker_utils::config::LibConfig;
 use stalker_utils::context::Context;
 use stalker_utils::fmt::hex;
 use stalker_utils::tag::Tag;
-use std::fs::{copy, create_dir, remove_dir, remove_file, File};
+use std::fs::{copy, create_dir_all, remove_dir, remove_file, File};
 use std::io::{Seek, SeekFrom, Write};
 use std::os::unix::prelude::FileExt;
 use std::path::Path;
@@ -16,7 +17,7 @@ impl Change {
         format!("{:x}_{}_{:02x}", self.0.offset, hex(&self.0.bytes), self.2)
     }
 
-    pub fn perform(
+    pub fn perform<M: FaultModel>(
         &self,
         ctx: &Context,
         lib_config: &LibConfig,
@@ -28,7 +29,8 @@ impl Change {
             // Output texts files
             let f_bdr = |name: &str| {
                 format!(
-                    "data/stalker/output/{}/{}/{}.{}",
+                    "data/stalker/output/{}/{}/{}/{}.{}",
+                    M::tag(),
                     ctx.id(),
                     &inj_config.name,
                     self.id(),
@@ -48,10 +50,10 @@ impl Change {
             }
             // Binary files
             let origin = Path::new(&ctx.config.binary_info.core.file);
-            let load = format!("/tmp/{}", &self.id());
+            let load = format!("/tmp/stalker-cache/{}", &self.id());
             let new = format!("{}/{}", &load, &lib_config.link_name);
 
-            create_dir(&load)?;
+            create_dir_all(&load)?;
             info!(
                 "Performing injection `{}` for {}.",
                 &self.id(),

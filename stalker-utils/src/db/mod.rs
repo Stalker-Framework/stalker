@@ -4,7 +4,7 @@ use crate::Result;
 use std::fs::create_dir_all;
 
 pub struct Db {
-    pub mutant: sled::Tree,
+    pub mutant: sled::Db,
     pub instruction: sled::Db,
 }
 
@@ -16,7 +16,7 @@ impl Db {
         let mutant_db = sled::open(format!("{}/mutant", db_path))?;
         let db = Db {
             instruction: sled::open(format!("{}/target/{}/instruction", db_path, identity))?,
-            mutant: mutant_db.open_tree("mutant")?,
+            mutant: mutant_db,
         };
         Ok(db)
     }

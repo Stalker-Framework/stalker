@@ -5,7 +5,7 @@ use super::db::Db;
 use super::loc::LibInstance;
 use super::Result;
 use log::{info, warn};
-use rzpipe::RzPipe;
+use rzpipe::{RzPipe, RzPipeSpawnOptions};
 use std::boxed::Box;
 use std::fs::create_dir_all;
 use std::path::Path;
@@ -41,7 +41,13 @@ impl Default for ContextBuilder {
 
 impl ContextBuilder {
     pub fn build(self) -> Result<Context> {
-        let mut rz = RzPipe::spawn(&self.lib_path, None)?;
+        let mut rz = RzPipe::spawn(
+            &self.lib_path,
+            Some(RzPipeSpawnOptions {
+                exepath: "rizin".to_owned(),
+                args: vec!["-2"],
+            }),
+        )?;
         if let Some(config) = self.config {
             let config = config.update(&mut rz)?;
             let rzdb = format!("{}/{}.rzdb", config.rz_path, config.id());

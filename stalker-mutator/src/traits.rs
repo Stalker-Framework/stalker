@@ -3,7 +3,7 @@ use std::{iter::Map, marker::PhantomData};
 
 pub trait FaultModel
 where
-    Self: Sized + Tag,
+    Self: Sized + Tag + Sync + Send,
 {
     fn next_mutant(iter: &mut IntoIter<Self>) -> Option<Vec<u8>>;
 }
