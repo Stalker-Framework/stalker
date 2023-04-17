@@ -1,7 +1,6 @@
 
 use crate::{executor, generator};
 use clap::{Args, Parser, Subcommand};
-use env_logger::Env;
 use log::info;
 use serde::{Deserialize, Serialize};
 use serfig::collectors::{from_file, from_self};
@@ -16,7 +15,7 @@ use stalker_utils::context::Context;
 /// Analyzing fragility of dynamic libs under hardware fault models.
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
-struct Cli {
+pub struct Cli {
     /// Number of times to greet
     #[arg(short, long, value_name = "FILE", default_value_t = String::from("config/config.toml"))]
     config: String,
@@ -26,7 +25,7 @@ struct Cli {
 
     /// Turn logging on
     #[arg(short, long, action = clap::ArgAction::Count)]
-    verbose: u8,
+    pub(crate) verbose: u8,
 
     #[command(subcommand)]
     command: Option<Commands>,
@@ -70,23 +69,9 @@ struct CliConfig {
     injection: InjectionConfig,
 }
 
-pub fn run<M: FaultModel>() -> anyhow::Result<()> {
-    let cli = Cli::parse();
-
-    let env = match cli.verbose {
-        0 => Env::default().default_filter_or("warn,sled=error,serfig=error"),
-        1 => Env::default().default_filter_or("info,sled=error,serfig=error"),
-        _ => Env::default().default_filter_or("debug,sled=error,serfig=error"),
-    };
-
-    env_logger::Builder::from_env(env)
-        .format_timestamp(None)
-        .init();
-
-    info!("Verbose level: {}", cli.verbose);
-
+pub fn run<M: FaultModel>(cli: &Cli) -> anyhow::Result<()> {
     // To analyze or generate the experiments;
-    match cli.command {
+    match &cli.command {
         Some(Commands::Analyze(analyze_args)) => {
             let analyze_config = Builder::default()
                 .collect(from_file(Toml, &analyze_args.config))

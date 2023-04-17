@@ -41,6 +41,7 @@ pub fn analyze<T: Display + Effect + VariantNames + AsRef<str> + EnumProperty>(
     config: &AnalyzeConfig,
 ) -> Result<()> {
     let root = Path::new(&config.path);
+
     for exp_id in config.experiments.keys() {
         let exps_dir = root.join(exp_id);
         let exps = config.experiments[exp_id].iter();
