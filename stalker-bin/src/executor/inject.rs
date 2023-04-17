@@ -14,8 +14,10 @@ pub fn exec<M: FaultModel>(
     let injections = inj_config.target_syms.iter().map(|i| ctx.inject::<M>(i));
     let iter = injections.flatten();
     let closure = |i: Change| {
-        i.perform::<M>(ctx, lib_config, inj_config).expect("Not normal.");
+        i.perform::<M>(ctx, lib_config, inj_config)
+            .expect("Not normal.");
     };
+
     if parallel {
         warn!("Using rayon parallel iterator");
         iter.par_bridge().for_each(closure);

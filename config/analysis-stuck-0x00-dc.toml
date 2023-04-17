@@ -18,12 +18,12 @@ output = { path = "data/stalker/output/stuck-0x00/",  mode = "All" }
 ]
 
 "arm-64-linux-libgcrypt.so.20.3.4" = [
-  "aes-ecb",
+  # "aes-ecb",
   # "modes-ctr",
   # "modes-cbc",
   # "aes-ecb-armv8",
   # "modes-cbc-armv8",
-  # "modes-ctr-armv8"
+  "modes-ctr-armv8"
 ]
 "arm-64-linux-libmbedcrypto.so.3.1.0" = [
   # "aes-internal"

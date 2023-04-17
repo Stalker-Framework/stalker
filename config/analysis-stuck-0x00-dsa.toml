@@ -1,0 +1,12 @@
+path = "/home/ray/repo/megrxu/stalker/data/stalker/output/stuck-0x00"
+has_expected = false
+model = "ProbabilisticSignature"
+fields = 3
+detail = true
+output = { path = "data/stalker/output/stuck-0x00",  mode = "All" }
+
+[experiments]
+"arm-64-linux-libcrypto.so.1.1" = [ "ecdsa" ]
+"arm-64-linux-libgcrypt.so.20.3.4" = [ "ecdsa" ]
+# "arm-64-linux-libmbedcrypto.so.3.1.0" = [ "ecdsa" ]
+# "arm-64-linux-libcrypto.so.50.0.0" = [ "ecdsa" ]

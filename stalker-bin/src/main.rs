@@ -24,7 +24,7 @@ fn main() -> anyhow::Result<()> {
     info!("Verbose level: {}", cli.verbose);
 
     // run::<Bitflip>()?;
-    // run::<Stuck<0xff>>(&cli)?;
+    run::<Stuck<0xff>>(&cli)?;
     run::<Stuck<0x00>>(&cli)?;
     Ok(())
 }
